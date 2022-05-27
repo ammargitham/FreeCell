@@ -167,15 +167,15 @@ html {
     margin-left: -0.3rem;
     
     &.pause {
-      background-image: url('images/pause.svg')
+      background-image: url('./images/pause.svg')
     }
 
     &.undo {
-      background-image: url('images/undo.svg')
+      background-image: url('./images/undo.svg')
     }
 
     &.reset {
-      background-image: url('images/reset.svg')
+      background-image: url('./images/reset.svg')
     }
   }
 }
