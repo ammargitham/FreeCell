@@ -30,7 +30,7 @@ function Card({ card, className, onClick, ...rest }, ref) {
     <Container
       ref={ref}
       {...rest}
-      className={`card ${className || ""} ${onClick && "clickable"}`}
+      className={`card ${className || ""} ${onClick ? "clickable" : ""}`}
       onClick={onClick ? onClick : undefined}
     >
       <>

@@ -368,3 +368,12 @@ export function findCascadeIndex(cascades, cardIndex) {
     return c.includes(cardIndex);
   });
 }
+
+export function checkIfWon(foundationCards) {
+  return !!(
+    foundationCards &&
+    foundationCards
+      .map((c) => indexToCard(c))
+      .every((c) => c && c.rank === "king")
+  );
+}

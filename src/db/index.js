@@ -108,6 +108,29 @@ export default class DatabaseManager {
   }
 
   /**
+   * Adds or update the game result in db
+   * @param {GameResult} gameResult
+   * @returns {Promise<int>} Promise which resolves to the primary key of the inserted GameResult
+   */
+  async addOrUpdateGameResultByGameNum(gameResult) {
+    if (!this.db || !gameResult) {
+      return;
+    }
+    // check gameNum exists
+    const existing = await this.getGameResultByGameNum(gameResult.gameNum);
+    let id = null;
+    if (existing) {
+      id = existing.id;
+    }
+    if (id === null) {
+      return await this.addGameResult(gameResult);
+    } else {
+      gameResult.id = id;
+      return await this.updateGameResult(gameResult);
+    }
+  }
+
+  /**
    * Update the game result in db
    * @param {GameResult} gameResult The GameResult object to update. Should contain valid id.
    * @returns {Promise<undefined>}

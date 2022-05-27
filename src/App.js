@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import Board from "./Board";
 import useFreeCellGame from "./game";
@@ -15,10 +15,15 @@ export default function App() {
     undo,
     onOpenCellClick,
     onCascadeClick,
+    setCanStartTimer,
   ] = useFreeCellGame();
 
   const appRef = useRef();
   const imagesLoaded = useOnLoadImages(appRef);
+
+  useEffect(() => {
+    setCanStartTimer(imagesLoaded);
+  }, [imagesLoaded, setCanStartTimer]);
 
   return (
     <div className="App" ref={appRef}>
@@ -31,8 +36,9 @@ export default function App() {
           activeCard: state.activeCard,
           foundationCards: state.foundationCards,
           moveCount: state.moveCount,
+          elapsedTime: state.elapsedTime,
         }}
-        loading={!imagesLoaded}
+        loading={state.loading || !imagesLoaded}
         onOpenCellClick={onOpenCellClick}
         onUndoClick={undo}
         onNewGameClick={newGame}

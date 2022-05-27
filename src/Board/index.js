@@ -56,6 +56,7 @@ export default function Board({
     foundationCards: [],
     cascades: [],
     moveCount: 0,
+    elapsedTime: 0,
   },
   loading,
   onOpenCellClick,
@@ -122,6 +123,7 @@ export default function Board({
       />
       <Actions
         moveCount={board.moveCount}
+        elapsedTime={board.elapsedTime}
         canUndo={board.canUndo}
         onUndoClick={onUndoClick}
         onNewGameClick={onNewGameClick}

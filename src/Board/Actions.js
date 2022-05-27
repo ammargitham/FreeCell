@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import formatSeconds from "../utils/formatSeconds";
 
 const Container = styled.div`
   display: flex;
@@ -23,6 +24,7 @@ const ButtonsContainer = styled.div`
 export const Actions = ({
   canUndo,
   moveCount,
+  elapsedTime,
   onUndoClick,
   onNewGameClick,
   onResetClick,
@@ -51,6 +53,7 @@ export const Actions = ({
         </button>
       </ButtonsContainer>
       <span>Moves: {moveCount}</span>
+      <span>Time: {formatSeconds(elapsedTime)}</span>
     </Container>
   );
 };

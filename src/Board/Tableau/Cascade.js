@@ -1,12 +1,13 @@
-import { useRef, useMemo } from "react";
+import { useMemo } from "react";
 import styled from "styled-components";
-import useComponentSize from "@rehooks/component-size";
+// import useComponentSize from "@rehooks/component-size";
 import { isNil } from "lodash";
 
 import Card from "../Card";
 import { indexToCard } from "../../game/helper";
 // import useWindowSize from "../../utils/useWindowSize";
 import useDebounce from "../../utils/useDebounce";
+import useComponentSize from "../../utils/useComponentSize";
 
 const Container = styled.div`
   /* position: relative; */
@@ -45,13 +46,10 @@ const Container = styled.div`
 `;
 
 export default function Cascade({ cards = [], activeCard, onCascadeClick }) {
-  const ref = useRef();
-  const cardRef = useRef();
-
-  const { height } = useComponentSize(ref);
+  const [ref, { height }] = useComponentSize();
   const debouncedHeight = useDebounce(height, 200);
 
-  const { height: cardHeight } = useComponentSize(cardRef);
+  const [cardRef, { height: cardHeight }] = useComponentSize();
   const debouncedCardHeight = useDebounce(cardHeight, 200);
 
   const maxOffset = useMemo(() => {
@@ -96,7 +94,7 @@ export default function Cascade({ cards = [], activeCard, onCascadeClick }) {
           <Card
             ref={i === 0 ? cardRef : null}
             style={{ "--offset": i }}
-            className={`${isActive && "active"}`}
+            className={`${isActive ? "active" : ""}`}
             key={card}
             card={actual}
           />

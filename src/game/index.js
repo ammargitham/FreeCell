@@ -1,4 +1,6 @@
-import { useReducer, useCallback, useEffect, useMemo } from "react";
+import { useReducer, useCallback, useEffect, useMemo, useState } from "react";
+import { cloneDeep, isNil } from "lodash";
+
 import {
   canMoveOver,
   getStackFromCascade,
@@ -6,15 +8,14 @@ import {
   generateNewGameState,
   findCascadeIndex,
   movableCardCount,
-  indexToCard,
   storeGameState,
+  checkIfWon,
 } from "./helper";
-import { cloneDeep, isNil } from "lodash";
-
 import { dbManager } from "../db";
 import GameResult from "../db/GameResult";
 
 export const initialState = {
+  loading: true,
   gameNum: null,
   openCards: Array.from({ length: 4 }),
   foundationCards: Array.from({ length: 4 }),
@@ -23,15 +24,20 @@ export const initialState = {
   history: [],
   moveCount: 0,
   wasLastUndo: false,
+  elapsedTime: 0,
+  paused: true,
 };
 
 const actions = {
   reset: "reset",
   newGame: "newGame",
+  setState: "setState",
   undo: "undo",
   openCellClick: "openCellClick",
   onMove: "onMove",
   onCascadeClick: "onCascadeClick",
+  updateElapsedTime: "updateElapsedTime",
+  setPaused: "setPaused",
 };
 
 const reducer = (state, action) => {
@@ -53,9 +59,8 @@ const reducer = (state, action) => {
         history: updatedHistory,
       };
     }
-    case actions.newGame: {
-      const { state: gotState, loaded } = generateNewGameState(initialState);
-      return gotState;
+    case actions.setState: {
+      return action.state;
     }
     case actions.undo: {
       if (!state.history || state.history.length <= 1) {
@@ -363,46 +368,117 @@ const reducer = (state, action) => {
         wasLastUndo: false,
       };
     }
+    case actions.updateElapsedTime: {
+      return {
+        ...state,
+        elapsedTime: action.elapsedTime,
+      };
+    }
+    case actions.setPaused: {
+      return {
+        ...state,
+        paused: action.paused,
+      };
+    }
     default:
       return state;
   }
 };
 
 const useFreeCellGame = () => {
-  const [state, dispatch] = useReducer(reducer, initialState, (s) => {
-    const { state: gotState, loaded } = generateNewGameState(s, null, true);
-    // if (!loaded) {
-    //   dbManager.addGameResult(
-    //     new GameResult(
-    //       null,
-    //       gotState.gameNum,
-    //       0,
-    //       0,
-    //       GameResult.Status.NOT_COMPLETED,
-    //     ),
-    //   );
-    // }
-    return gotState;
-  });
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const [canStartTimer, setCanStartTimer] = useState(false);
+
+  // keeping a separate paused state, so that its is not written to local storage
+  // const [timerState, setTimerState] = useState({
+  //   startAt: 0,
+  //   paused: true,
+  // });
+
+  // const { elapsedTime, reset: resetTimer } = useElapsedTime({
+  //   isPlaying: !state.paused,
+  //   startAt: 0,
+  //   updateInterval: 1,
+  // });
+
+  // const { time, start, pause, reset: resetTimer, status } = useTimer({
+  //   initialTime: state.elapsedTime,
+  // });
+
+  // useEffect(() => {
+  //   if (state.loading || state.paused || !canStartTimer) {
+  //     return;
+  //   }
+  //   console.log(time);
+  //   // dispatch({
+  //   //   type: actions.updateElapsedTime,
+  //   //   elapsedTime: time,
+  //   // });
+  // }, [canStartTimer, state.loading, state.paused, time]);
+
+  // useEffect(() => {
+  //   if (state.loading || state.paused || !canStartTimer) {
+  //     pause();
+  //     return;
+  //   }
+  //   start();
+  // }, [state.paused, state.loading, canStartTimer, start, pause]);
+
+  useEffect(() => {
+    // generate or load game
+    const { state: gotState, loaded } = generateNewGameState(
+      initialState,
+      null,
+      true,
+    );
+    // set its loading to false
+    gotState.loading = false;
+    gotState.paused = false;
+
+    if (loaded) {
+      // check if won or lost, if not resume the timer
+      const hasWon = checkIfWon(gotState.foundationCards);
+      if (hasWon) {
+        gotState.paused = true;
+      }
+    }
+
+    // dispatch it to reducer
+    dispatch({
+      type: actions.setState,
+      state: gotState,
+    });
+
+    if (!loaded) {
+      // if a new game was generated, save it to db
+      dbManager
+        .addOrUpdateGameResultByGameNum(
+          new GameResult(
+            null,
+            gotState.gameNum,
+            0,
+            0,
+            GameResult.Status.NOT_COMPLETED,
+          ),
+        )
+        .catch((err) => {
+          console.error(err);
+        });
+    }
+  }, []);
 
   const canUndo = useMemo(() => state.history && state.history.length > 1, [
     state.history,
   ]);
 
   /* game has been won when all cards in foundation are kings*/
-  const hasWon = useMemo(
-    () =>
-      !!(
-        state.foundationCards &&
-        state.foundationCards
-          .map((c) => indexToCard(c))
-          .every((c) => c && c.rank === "king")
-      ),
-    [state.foundationCards],
-  );
+  const hasWon = useMemo(() => checkIfWon(state.foundationCards), [
+    state.foundationCards,
+  ]);
 
   useEffect(() => {
-    storeGameState(state);
+    // save state on any change
+    // storeGameState(state);
   }, [state]);
 
   useEffect(() => {
@@ -421,10 +497,52 @@ const useFreeCellGame = () => {
   }, []);
 
   const newGame = useCallback(() => {
+    const { state: gotState } = generateNewGameState(initialState, null, false);
+    // set its loading to false
+    gotState.loading = false;
+    // dispatch it to reducer
     dispatch({
-      type: actions.newGame,
+      type: actions.setState,
+      state: gotState,
     });
+
+    dbManager
+      .addOrUpdateGameResultByGameNum(
+        new GameResult(
+          null,
+          gotState.gameNum,
+          0,
+          0,
+          GameResult.Status.NOT_COMPLETED,
+        ),
+      )
+      .catch((err) => {
+        console.error(err);
+      });
   }, []);
+
+  useEffect(() => {
+    if (!hasWon) {
+      return;
+    }
+    dispatch({
+      type: actions.setPaused,
+      paused: true,
+    });
+    //   const updateResult = async () => {
+    //     const existing = await dbManager.getGameResultByGameNum(state.gameNum);
+    //     console.log(existing);
+    //     let gameResult = existing;
+    //     if (!existing) {
+    //       gameResult = new GameResult(
+    //         null,
+    //         state.gameNum,
+    //         state.
+    //       )
+    //     }
+    //   };
+    //   updateResult().catch((err) => console.log(err));
+  }, [hasWon]);
 
   const undo = useCallback(() => {
     dispatch({
@@ -455,6 +573,7 @@ const useFreeCellGame = () => {
     undo,
     onOpenCellClick,
     onCascadeClick,
+    setCanStartTimer,
   ];
 };
 
