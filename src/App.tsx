@@ -1,9 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
-import Board from "./Board";
-import useFreeCellGame from "./game";
-import "./styles.scss";
-import { useOnLoadImages } from "./utils/useOnLoadImages";
+import Board from './Board';
+import useFreeCellGame from './game';
+import './styles.scss';
+import { useOnLoadImages } from './utils/useOnLoadImages';
 
 export default function App() {
   const [
@@ -26,8 +26,8 @@ export default function App() {
   }, [imagesLoaded, setCanStartTimer]);
 
   return (
-    <div 
-      className="App" 
+    <div
+      className="App"
       ref={appRef}
     >
       <Board

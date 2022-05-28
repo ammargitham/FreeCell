@@ -1,5 +1,6 @@
-import Cascade from "./Cascade";
-import styled from "styled-components";
+import styled from 'styled-components';
+
+import Cascade from './Cascade';
 
 const Container = styled.div`
   display: flex;
@@ -33,7 +34,7 @@ type TableauProps = {
   cascades: Array<Array<number>>,
   activeCard?: number,
   onCascadeClick?: (index: number) => void,
-}
+};
 
 export default function Tableau({
   cascades = Array(8).fill([]),
@@ -43,16 +44,15 @@ export default function Tableau({
   return (
     <Container>
       <SubContainer>
-        {Array.from({ length: 8 }).map((_v, i) => {
-          return (
-            <Cascade
-              key={i}
-              cards={cascades[i]}
-              activeCard={activeCard}
-              onCascadeClick={() => onCascadeClick && onCascadeClick(i)}
-            />
-          );
-        })}
+        {Array.from({ length: 8 }).map((_v, i) => (
+          <Cascade
+            // eslint-disable-next-line react/no-array-index-key
+            key={i}
+            cards={cascades[i]}
+            activeCard={activeCard}
+            onCascadeClick={() => onCascadeClick && onCascadeClick(i)}
+          />
+        ))}
       </SubContainer>
     </Container>
   );

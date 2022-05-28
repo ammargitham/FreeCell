@@ -1,17 +1,17 @@
-import { useMemo } from "react";
-import styled from "styled-components";
+import { useMemo } from 'react';
+import styled from 'styled-components';
 // import useComponentSize from "@rehooks/component-size";
-import { isNil } from "lodash";
+import { isNil } from 'lodash';
 
-import Card from "../Card";
-import { indexToCard } from "../../game/helper";
+import Card from '../Card';
+import { indexToCard } from '../../game/helper';
 // import useWindowSize from "../../utils/useWindowSize";
-import useDebounce from "../../utils/useDebounce";
-import useComponentSize from "../../utils/useComponentSize";
+import useDebounce from '../../utils/useDebounce';
+import useComponentSize from '../../utils/useComponentSize';
 
 type ContainerProps = {
   $topOffset: number,
-}
+};
 
 const Container = styled.div<ContainerProps>`
   /* position: relative; */
@@ -72,8 +72,7 @@ export default function Cascade({ cards = [], activeCard, onCascadeClick }: Casc
     if (!debouncedHeight || !debouncedCardHeight || cards.length <= 1) {
       return 0;
     }
-    let offset =
-      (debouncedHeight - debouncedCardHeight - 20) / (cards.length - 1);
+    let offset = (debouncedHeight - debouncedCardHeight - 20) / (cards.length - 1);
     if (offset > maxOffset) {
       offset = maxOffset;
     }
@@ -91,7 +90,7 @@ export default function Cascade({ cards = [], activeCard, onCascadeClick }: Casc
 
   return (
     <Container
-      className={`cascade ${clickable ? "clickable" : ""}`}
+      className={`cascade ${clickable ? 'clickable' : ''}`}
       ref={ref}
       $topOffset={topCardMargin}
       onClick={clickable ? onCascadeClick : undefined}
@@ -102,7 +101,7 @@ export default function Cascade({ cards = [], activeCard, onCascadeClick }: Casc
         return (
           <Card
             ref={i === 0 ? cardRef : null}
-            className={`${isActive ? "active" : ""}`}
+            className={`${isActive ? 'active' : ''}`}
             key={card}
             card={actual}
           />

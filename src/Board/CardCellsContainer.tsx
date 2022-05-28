@@ -1,6 +1,6 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
-import CardCell from "./CardCell";
+import CardCell from './CardCell';
 
 const Container = styled.div`
   display: flex;
@@ -57,6 +57,7 @@ export default function CardCellsContainer({
           const isActive = activeCard === card;
           return (
             <CardCell
+              // eslint-disable-next-line react/no-array-index-key
               key={`card-cell-${i}`}
               className="card-cell"
               card={card}

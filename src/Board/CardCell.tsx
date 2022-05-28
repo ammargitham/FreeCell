@@ -1,8 +1,8 @@
-import styled from "styled-components";
-import { isNil } from "lodash";
+import styled from 'styled-components';
+import { isNil } from 'lodash';
 
-import Card from "./Card";
-import { indexToCard } from "../game/helper";
+import Card from './Card';
+import { indexToCard } from '../game/helper';
 
 const EmptyCell = styled.div`
   display: flex;
@@ -23,16 +23,18 @@ type CardCellProps = {
   onClick?: () => void,
 };
 
-export default function CardCell({ card, className, isActive, onClick }: CardCellProps) {
+export default function CardCell({
+  card, className, isActive, onClick,
+}: CardCellProps) {
   return !isNil(card) ? (
     <Card
-      className={`${className || ""} ${isActive && "active"}`}
+      className={`${className || ''} ${isActive && 'active'}`}
       card={indexToCard(card)}
       onClick={onClick}
     />
   ) : (
     <EmptyCell
-      className={`${className || ""} ${onClick ? "clickable" : ""}`}
+      className={`${className || ''} ${onClick ? 'clickable' : ''}`}
       onClick={onClick}
     />
   );
