@@ -477,8 +477,11 @@ const useFreeCellGame = () => {
   ]);
 
   useEffect(() => {
+    if (state.loading) {
+      return;
+    }
     // save state on any change
-    // storeGameState(state);
+    storeGameState(state);
   }, [state]);
 
   useEffect(() => {
