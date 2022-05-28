@@ -54,6 +54,7 @@
     ]
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.182",
     "@types/styled-components": "^5.1.25",
     "eslint": "^8.16.0",
     "eslint-config-react-app": "^7.0.1",
