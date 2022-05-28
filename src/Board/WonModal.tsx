@@ -1,5 +1,5 @@
-import { Modal } from "../Modal";
-import styled from "styled-components";
+import styled from 'styled-components';
+import Modal from '../Modal';
 
 const Container = styled.div`
   display: flex;
@@ -23,19 +23,23 @@ const Container = styled.div`
 type WonModalProps = {
   open?: boolean,
   onNewGameClick?: () => void,
-}
+};
 
-export const WonModal = ({ open, onNewGameClick }: WonModalProps) => {
+export default function WonModal({ open, onNewGameClick }: WonModalProps) {
   return (
     <Modal open={open}>
       <Container>
         <span className="header">Game won!</span>
         <div className="actions">
-          <button className="btn actionBtn" onClick={onNewGameClick}>
+          <button
+            type="button"
+            className="btn actionBtn"
+            onClick={onNewGameClick}
+          >
             New Game
           </button>
         </div>
       </Container>
     </Modal>
   );
-};
+}

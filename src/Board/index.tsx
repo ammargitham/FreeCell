@@ -5,7 +5,7 @@ import { isNil } from 'lodash';
 import Actions from './Actions';
 import CardCellsContainer from './CardCellsContainer';
 import Tableau from './Tableau';
-import { WonModal } from './WonModal';
+import WonModal from './WonModal';
 
 const Container = styled.div`
   position: relative;
