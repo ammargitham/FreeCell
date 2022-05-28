@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import Board from './Board';
 import useFreeCellGame from './game';
 import './styles.scss';
-import { useOnLoadImages } from './utils/useOnLoadImages';
+import useOnLoadImages from './utils/useOnLoadImages';
 
 export default function App() {
   const [
