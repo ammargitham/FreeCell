@@ -1,5 +1,7 @@
-import { useReducer, useCallback, useEffect, useMemo, useState } from "react";
-import { cloneDeep, isNil } from "lodash";
+import {
+  useReducer, useCallback, useEffect, useMemo, useState,
+} from 'react';
+import { cloneDeep, isNil } from 'lodash';
 
 import {
   canMoveOver,
@@ -10,9 +12,9 @@ import {
   movableCardCount,
   storeGameState,
   checkIfWon,
-} from "./helper";
-import { dbManager } from "../db";
-import GameResult from "../db/GameResult";
+} from './helper';
+import { dbManager } from '../db';
+import GameResult from '../db/GameResult';
 
 export const initialState = {
   loading: true,
@@ -29,15 +31,15 @@ export const initialState = {
 };
 
 const actions = {
-  reset: "reset",
-  newGame: "newGame",
-  setState: "setState",
-  undo: "undo",
-  openCellClick: "openCellClick",
-  onMove: "onMove",
-  onCascadeClick: "onCascadeClick",
-  updateElapsedTime: "updateElapsedTime",
-  setPaused: "setPaused",
+  reset: 'reset',
+  newGame: 'newGame',
+  setState: 'setState',
+  undo: 'undo',
+  openCellClick: 'openCellClick',
+  onMove: 'onMove',
+  onCascadeClick: 'onCascadeClick',
+  updateElapsedTime: 'updateElapsedTime',
+  setPaused: 'setPaused',
 };
 
 const reducer = (state, action) => {
@@ -83,7 +85,7 @@ const reducer = (state, action) => {
     }
     case actions.openCellClick: {
       const openCellCard = state.openCards[action.cellIndex];
-      let updatedOpenCards = [...state.openCards] || Array.from({ length: 4 });
+      const updatedOpenCards = [...state.openCards] || Array.from({ length: 4 });
       // if there is an active card
       if (!isNil(state.activeCard)) {
         // if current clicked cell contains a card, do nothing and deactivate active card
@@ -191,10 +193,9 @@ const reducer = (state, action) => {
         let canMove;
 
         const toCascade = state.cascades[toCascadeIndex];
-        const toCard =
-          toCascade.length === 0 ? null : toCascade[toCascade.length - 1];
+        const toCard = toCascade.length === 0 ? null : toCascade[toCascade.length - 1];
 
-        for (i = 0; i < fromStack.length; i++) {
+        for (i = 0; i < fromStack.length; i += 1) {
           // we need to check if card in the fromStack is movable to the next card
           // we have to perform a loop until we exhause possible fromCards in the fromStack
           const fromCard = fromStack[i];
@@ -301,9 +302,7 @@ const reducer = (state, action) => {
 
       // console.log(bottomCards);
 
-      let moveResults = bottomCards.map((b) => {
-        return canMoveToFoundation(state.foundationCards, b);
-      });
+      let moveResults = bottomCards.map((b) => canMoveToFoundation(state.foundationCards, b));
 
       let firstMovableIndex = moveResults.findIndex((m) => m.shouldMove);
 
@@ -315,9 +314,7 @@ const reducer = (state, action) => {
       if (firstMovableIndex < 0) {
         // check if any open cell card should be moved
         bottomCards = state.openCards;
-        moveResults = bottomCards.map((c) => {
-          return canMoveToFoundation(state.foundationCards, c);
-        });
+        moveResults = bottomCards.map((c) => canMoveToFoundation(state.foundationCards, c));
 
         firstMovableIndex = moveResults.findIndex((m) => m.shouldMove);
 
@@ -471,7 +468,7 @@ const useFreeCellGame = () => {
     state.history,
   ]);
 
-  /* game has been won when all cards in foundation are kings*/
+  /* game has been won when all cards in foundation are kings */
   const hasWon = useMemo(() => checkIfWon(state.foundationCards), [
     state.foundationCards,
   ]);
@@ -525,13 +522,12 @@ const useFreeCellGame = () => {
   }, []);
 
   useEffect(() => {
-    if (!hasWon) {
-      return;
-    }
-    dispatch({
-      type: actions.setPaused,
-      paused: true,
-    });
+    // if (!hasWon) {
+    // }
+    // dispatch({
+    //   type: actions.setPaused,
+    //   paused: true,
+    // });
     //   const updateResult = async () => {
     //     const existing = await dbManager.getGameResultByGameNum(state.gameNum);
     //     console.log(existing);

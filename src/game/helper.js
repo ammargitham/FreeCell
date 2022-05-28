@@ -1,5 +1,5 @@
-import { transform, isNil } from "lodash";
-import seedrandom from "seedrandom";
+import { transform, isNil } from 'lodash';
+import seedrandom from 'seedrandom';
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER#polyfill
 if (!Number.MAX_SAFE_INTEGER) {
@@ -9,27 +9,73 @@ if (!Number.MAX_SAFE_INTEGER) {
 export const minGameNum = 1;
 export const maxGameNum = Number.MAX_SAFE_INTEGER;
 
-export const getGameNumFromRandom = (random) => {
-  return minGameNum + Math.round(random * (maxGameNum - minGameNum + 1));
-};
+export const getGameNumFromRandom = (random) => minGameNum
+  + Math.round(random * (maxGameNum - minGameNum + 1));
 
 export const storeGameState = (state) => {
-  localStorage.setItem("state", JSON.stringify(state));
+  localStorage.setItem('state', JSON.stringify(state));
 };
 
 const getStoredGameState = () => {
   try {
-    return JSON.parse(localStorage.getItem("state"));
+    return JSON.parse(localStorage.getItem('state'));
   } catch (err) {
     return null;
   }
 };
 
+// https://stackoverflow.com/questions/16801687/javascript-random-ordering-with-seed
+const shuffle = (array, rndGen) => {
+  let m = array.length;
+  let t;
+  let i;
+  // While there remain elements to shuffle…
+  while (m) {
+    // Pick a remaining element…
+    // eslint-disable-next-line no-plusplus
+    i = Math.floor(rndGen() * m--);
+
+    // And swap it with the current element.
+    t = array[m];
+    // eslint-disable-next-line no-param-reassign
+    array[m] = array[i];
+    // eslint-disable-next-line no-param-reassign
+    array[i] = t;
+  }
+
+  return array;
+};
+
+export const getRandomCascades = (gameNum) => {
+  const rndGen = seedrandom(gameNum);
+  const cards = Array.from({ length: 52 }, (_v, i) => i);
+  // console.log(seed, cards);
+  const shuffled = shuffle([...cards], rndGen);
+  // console.log(shuffled);
+
+  // https://stackoverflow.com/a/60231868/1436766
+  const sizes = [7, 7, 7, 7, 6, 6, 6, 6];
+  let i = 0;
+  let j = 0;
+  const chunks = [];
+  while (i < shuffled.length) {
+    // eslint-disable-next-line no-plusplus
+    chunks.push(shuffled.slice(i, (i += sizes[j++ % sizes.length])));
+  }
+  // console.log(chunks);
+  return chunks;
+};
+
 /**
  * Generates new game or loads a game from local storage
- * @param {Object} initialState - The initial state which will be used as base for the new game state
- * @param {int} gameNum - If provided, the initialized game state will be for that game number. If not provided, a new game will be generated. Note that if `loadFromStorage` is true and a game from storage is loaded, this parameter will be ignored
- * @param {boolean} loadFromStorage - If set to true, a game will be loaded from local storage. `initialState` and `gameNum` will be ignored if a game state is found in storage.
+ *
+ * @param {Object} initialState - The initial state which will be used as base for the new game
+ * state
+ * @param {int} gameNum - If provided, the initialized game state will be for that game number.
+ * If not provided, a new game will be generated. Note that if `loadFromStorage` is true and a
+ * game from storage is loaded, this parameter will be ignored
+ * @param {boolean} loadFromStorage - If set to true, a game will be loaded from local storage.
+ * `initialState` and `gameNum` will be ignored if a game state is found in storage.
  */
 export const generateNewGameState = (
   initialState,
@@ -73,69 +119,32 @@ export const generateNewGameState = (
   };
 };
 
-// https://stackoverflow.com/questions/16801687/javascript-random-ordering-with-seed
-const shuffle = (array, rndGen) => {
-  let m = array.length;
-  let t;
-  let i;
-  // While there remain elements to shuffle…
-  while (m) {
-    // Pick a remaining element…
-    i = Math.floor(rndGen() * m--);
-
-    // And swap it with the current element.
-    t = array[m];
-    array[m] = array[i];
-    array[i] = t;
-  }
-
-  return array;
-};
-
-export const getRandomCascades = (gameNum) => {
-  const rndGen = seedrandom(gameNum);
-  const cards = Array.from({ length: 52 }, (_v, i) => i);
-  // console.log(seed, cards);
-  const shuffled = shuffle([...cards], rndGen);
-  // console.log(shuffled);
-
-  // https://stackoverflow.com/a/60231868/1436766
-  const sizes = [7, 7, 7, 7, 6, 6, 6, 6];
-  let i = 0;
-  let j = 0;
-  const chunks = [];
-  while (i < shuffled.length) {
-    chunks.push(shuffled.slice(i, (i += sizes[j++ % sizes.length])));
-  }
-  // console.log(chunks);
-  return chunks;
-};
-
 export const suits = {
   CLUBS: {
-    name: "clubs",
-    color: "black",
+    name: 'clubs',
+    color: 'black',
   },
   DIAMONDS: {
-    name: "diamonds",
-    color: "red",
+    name: 'diamonds',
+    color: 'red',
   },
   HEARTS: {
-    name: "hearts",
-    color: "red",
+    name: 'hearts',
+    color: 'red',
   },
   SPADES: {
-    name: "spades",
-    color: "black",
+    name: 'spades',
+    color: 'black',
   },
 };
 const suitNames = Object.values(suits).map((v) => v.name);
 const suitColorMap = Object.values(suits).reduce((prev, v) => {
+  // eslint-disable-next-line no-param-reassign
   prev[v.name] = v.color;
   return prev;
 }, {});
 
-const endRanks = ["jack", "queen", "king"];
+const endRanks = ['jack', 'queen', 'king'];
 
 export const indexToCard = (index) => {
   if (isNil(index)) {
@@ -146,7 +155,7 @@ export const indexToCard = (index) => {
 
   let rank;
   if (col === 0) {
-    rank = "ace";
+    rank = 'ace';
   } else if (col > 9) {
     rank = endRanks[col - 10];
   } else {
@@ -166,7 +175,7 @@ export const cardToIndex = (card) => {
   const { suit, rank } = card;
   const suitIndex = suitNames.indexOf(suit);
   let rankIndex = -1;
-  if (rank === "ace") {
+  if (rank === 'ace') {
     rankIndex = 0;
   } else if (endRanks.includes(rank)) {
     const endRankIndex = endRanks.indexOf(rank);
@@ -219,7 +228,7 @@ export const getStackFromCascade = (cascade) => {
 
   const stack = transform(
     cascadeCopy,
-    function iterator(acc, curr) {
+    (acc, curr) => {
       if (!acc.length) {
         acc.push(curr);
         return true;
@@ -279,9 +288,9 @@ export const canMoveToFoundation = (foundations, cardIndex) => {
   // console.log(foundationCards, card);
 
   // check if one rank lower card exists in any of the foundation cells
-  const index = foundationCards.findIndex((c) => {
-    return c && c.suit === card.suit && c.indexInSuit === card.indexInSuit - 1;
-  });
+  const index = foundationCards.findIndex((c) => c
+    && c.suit === card.suit
+    && c.indexInSuit === card.indexInSuit - 1);
 
   if (index < 0) {
     // not found, cannot be moved
@@ -303,33 +312,27 @@ export const canMoveToFoundation = (foundations, cardIndex) => {
     };
   }
 
-  // this card `should` be moved only if there are no cards remaining on the board which can be moved over this card
-  // for eg. if card is `3 of diamonds`, and `2 of clubs` is still in the tableau or open cell, there is a possibility
-  // that the user can move `2 of clubs` over `3 of diamonds`. Hence the card can still be used, so `shouldMove`
-  // has to be set to `false`. Otherwise if both "black" 2s are already moved to foundation, this card can and
-  // should be moved.
+  // this card `should` be moved only if there are no cards remaining on the board which can be
+  // moved over this card.
+  // for eg. if card is `3 of diamonds`, and `2 of clubs` is still in the tableau or open cell,
+  // there is a possibility that the user can move `2 of clubs` over `3 of diamonds`.
+  // Hence the card can still be used, so `shouldMove` has to be set to `false`.
+  // Otherwise if both "black" 2s are already moved to foundation, this card can and should be moved
 
   // check if cards movable on the current card have been moved to foundation already
 
   const cardColor = suitColorMap[card.suit];
-  const checkColor = cardColor === "red" ? "black" : "red";
+  const checkColor = cardColor === 'red' ? 'black' : 'red';
   const checkSuits = Object.entries(suitColorMap)
-    .filter(([_s, color]) => {
-      return color === checkColor;
-    })
-    .map(([s, _color]) => {
-      return s;
-    });
+    .filter(([, color]) => color === checkColor)
+    .map(([s]) => s);
   const checkIndexInSuit = card.indexInSuit - 1;
 
   // console.log(checkColor, checkSuits, checkIndexInSuit);
 
-  const allMoved =
-    foundationCards.filter((f) => {
-      return (
-        f && checkSuits.includes(f.suit) && f.indexInSuit >= checkIndexInSuit
-      );
-    }).length === 2;
+  const allMoved = foundationCards.filter((f) => (
+    f && checkSuits.includes(f.suit) && f.indexInSuit >= checkIndexInSuit
+  )).length === 2;
 
   // console.log(allMoved);
 
@@ -360,20 +363,18 @@ export function movableCardCount(openCards, cascades, toCascadeIndex) {
       emptyCascadesCountVal -= 1;
     }
   }
-  return Math.pow(2, emptyCascadesCountVal) * (emptyCellsCount(openCards) + 1);
+  return 2 ** emptyCascadesCountVal * (emptyCellsCount(openCards) + 1);
 }
 
 export function findCascadeIndex(cascades, cardIndex) {
-  return cascades.findIndex((c) => {
-    return c.includes(cardIndex);
-  });
+  return cascades.findIndex((c) => c.includes(cardIndex));
 }
 
 export function checkIfWon(foundationCards) {
   return !!(
-    foundationCards &&
     foundationCards
+    && foundationCards
       .map((c) => indexToCard(c))
-      .every((c) => c && c.rank === "king")
+      .every((c) => c && c.rank === 'king')
   );
 }

@@ -1,4 +1,4 @@
-import { useState, useCallback, useLayoutEffect } from "react";
+import { useState, useCallback, useLayoutEffect } from 'react';
 
 function getSize(el: HTMLElement | null) {
   if (!el) {
@@ -31,20 +31,19 @@ export default function useComponentSize<T extends HTMLElement>() {
 
   useLayoutEffect(() => {
     if (!node) {
-      return;
+      return () => {};
     }
     handleResize();
-    if (typeof ResizeObserver === "function") {
+    if (typeof ResizeObserver === 'function') {
       let resizeObserver: ResizeObserver | null = new ResizeObserver(() => handleResize());
       resizeObserver.observe(node);
       return () => {
         resizeObserver?.disconnect();
         resizeObserver = null;
       };
-    } else {
-      window.addEventListener("resize", handleResize);
-      return () => window.removeEventListener("resize", handleResize);
     }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [node, handleResize]);
 
   return [ref, componentSize] as const;
