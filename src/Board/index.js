@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import styled from "styled-components";
 import { isNil } from "lodash";
 
-import { Actions } from "./Actions";
+import Actions from "./Actions";
 import CardCellsContainer from "./CardCellsContainer";
 import Tableau from "./Tableau";
 import { WonModal } from "./WonModal";
