@@ -24,7 +24,8 @@
         "@typescript-eslint"
     ],
     "ignorePatterns": [
-        "**/*.html"
+        "**/*.html",
+        "craco.config.js"
     ],
     "rules": {
         "react/jsx-filename-extension": [
@@ -36,9 +37,11 @@
     },
     "overrides": [
         {
-            "files": ["*.js","*.tsx"],
+            "files": ["*.js","*.tsx", "*.ts"],
             "rules": {
-              "react/require-default-props": "off"
+              "react/require-default-props": "off",
+              "no-console": ["error", { "allow": ["warn", "error"] }],
+              "@typescript-eslint/no-unused-vars": "warn"
             }
           }
     ]
