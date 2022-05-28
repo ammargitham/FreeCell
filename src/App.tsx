@@ -18,7 +18,7 @@ export default function App() {
     setCanStartTimer,
   ] = useFreeCellGame();
 
-  const appRef = useRef();
+  const appRef = useRef<HTMLDivElement>(null);
   const imagesLoaded = useOnLoadImages(appRef);
 
   useEffect(() => {
@@ -26,7 +26,10 @@ export default function App() {
   }, [imagesLoaded, setCanStartTimer]);
 
   return (
-    <div className="App" ref={appRef}>
+    <div 
+      className="App" 
+      ref={appRef}
+    >
       <Board
         board={{
           canUndo,
