@@ -2,6 +2,7 @@ import {
   useMemo, forwardRef, ForwardedRef, CSSProperties,
 } from 'react';
 import styled from 'styled-components';
+import { Card as CardType } from '../globals/types';
 
 const Container = styled.div`
   background: white;
@@ -14,7 +15,7 @@ const Container = styled.div`
 `;
 
 type CardProps = {
-  card: any,
+  card: CardType,
   className?: string,
   style?: CSSProperties,
   onClick?: () => void,
@@ -33,7 +34,7 @@ function Card(
     if (!card) {
       return undefined;
     }
-    return `${card.rank}_of_${card.suit}`;
+    return `${card.rank}_of_${card.suit.name}`;
   }, [card]);
 
   const src = useMemo(() => {

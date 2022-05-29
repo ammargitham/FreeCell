@@ -1,31 +1,34 @@
 import { transform, isNil } from 'lodash';
 import seedrandom from 'seedrandom';
-
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER#polyfill
-if (!Number.MAX_SAFE_INTEGER) {
-  Number.MAX_SAFE_INTEGER = 9007199254740991; // Math.pow(2, 53) - 1;
-}
+import {
+  Card, CardRank, JackQueenKing, MoveToFoundationCheckResult, suitNameColorMap, suitNames, suits,
+} from '../globals/types';
 
 export const minGameNum = 1;
-export const maxGameNum = Number.MAX_SAFE_INTEGER;
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER#polyfill
+export const maxGameNum = Number.MAX_SAFE_INTEGER || 9007199254740991; // Math.pow(2, 53) - 1;
 
-export const getGameNumFromRandom = (random) => minGameNum
+export const getGameNumFromRandom = (random: number) => minGameNum
   + Math.round(random * (maxGameNum - minGameNum + 1));
 
-export const storeGameState = (state) => {
+export const storeGameState = (state: any) => {
   localStorage.setItem('state', JSON.stringify(state));
 };
 
 const getStoredGameState = () => {
+  const state = localStorage.getItem('state');
+  if (!state) {
+    return null;
+  }
   try {
-    return JSON.parse(localStorage.getItem('state'));
+    return JSON.parse(state);
   } catch (err) {
     return null;
   }
 };
 
 // https://stackoverflow.com/questions/16801687/javascript-random-ordering-with-seed
-const shuffle = (array, rndGen) => {
+const shuffle = (array: any[], rndGen: seedrandom.PRNG) => {
   let m = array.length;
   let t;
   let i;
@@ -46,8 +49,8 @@ const shuffle = (array, rndGen) => {
   return array;
 };
 
-export const getRandomCascades = (gameNum) => {
-  const rndGen = seedrandom(gameNum);
+export const getRandomCascades = (gameNum: number) => {
+  const rndGen = seedrandom(gameNum.toString());
   const cards = Array.from({ length: 52 }, (_v, i) => i);
   // console.log(seed, cards);
   const shuffled = shuffle([...cards], rndGen);
@@ -78,9 +81,9 @@ export const getRandomCascades = (gameNum) => {
  * `initialState` and `gameNum` will be ignored if a game state is found in storage.
  */
 export const generateNewGameState = (
-  initialState,
-  gameNum,
-  loadFromStorage,
+  initialState: any,
+  gameNum: number | null,
+  loadFromStorage: boolean,
 ) => {
   if (loadFromStorage) {
     const loadedState = getStoredGameState();
@@ -93,7 +96,7 @@ export const generateNewGameState = (
     }
   }
 
-  let gameNumTemp = gameNum;
+  let gameNumTemp = gameNum || -1;
   if (!gameNum) {
     // create seed and random generator
     const gameNumGenerator = seedrandom();
@@ -119,41 +122,13 @@ export const generateNewGameState = (
   };
 };
 
-export const suits = {
-  CLUBS: {
-    name: 'clubs',
-    color: 'black',
-  },
-  DIAMONDS: {
-    name: 'diamonds',
-    color: 'red',
-  },
-  HEARTS: {
-    name: 'hearts',
-    color: 'red',
-  },
-  SPADES: {
-    name: 'spades',
-    color: 'black',
-  },
-};
-const suitNames = Object.values(suits).map((v) => v.name);
-const suitColorMap = Object.values(suits).reduce((prev, v) => {
-  // eslint-disable-next-line no-param-reassign
-  prev[v.name] = v.color;
-  return prev;
-}, {});
+const endRanks: JackQueenKing[] = ['jack', 'queen', 'king'];
 
-const endRanks = ['jack', 'queen', 'king'];
-
-export const indexToCard = (index) => {
-  if (isNil(index)) {
-    return null;
-  }
+export const indexToCard: (index: number) => Card = (index) => {
   const row = Math.floor(index / 13);
   const col = index % 13;
 
-  let rank;
+  let rank: CardRank;
   if (col === 0) {
     rank = 'ace';
   } else if (col > 9) {
@@ -162,36 +137,36 @@ export const indexToCard = (index) => {
     rank = col + 1;
   }
   return {
-    suit: suitNames[row],
+    suit: suits[row],
     rank,
-    indexInSuit: col, // can be used to check hierarchy
+    indexInSuit: col,
   };
 };
 
-export const cardToIndex = (card) => {
-  if (!card) {
-    return null;
-  }
+export const cardToIndex = (card: Card) => {
   const { suit, rank } = card;
-  const suitIndex = suitNames.indexOf(suit);
+  const suitIndex = suitNames.indexOf(suit.name);
   let rankIndex = -1;
   if (rank === 'ace') {
     rankIndex = 0;
-  } else if (endRanks.includes(rank)) {
+  } else if (typeof rank === 'string' && endRanks.includes(rank)) {
     const endRankIndex = endRanks.indexOf(rank);
     rankIndex = endRankIndex + 10;
-  } else {
+  } else if (typeof rank === 'number') {
     rankIndex = rank - 1;
+  }
+  if (rankIndex < 0) {
+    return -1;
   }
   return 13 * suitIndex + rankIndex;
 };
 
-export const canMoveOver = (fromIndex, toIndex) => {
+export const canMoveOver = (fromIndex: number, toIndex?: number) => {
   if (toIndex == null) {
     // we can move to an empty cascade
     return true;
   }
-  if (fromIndex === toIndex || isNil(fromIndex)) {
+  if (fromIndex === toIndex) {
     return false;
   }
   const fromCard = indexToCard(fromIndex);
@@ -201,7 +176,7 @@ export const canMoveOver = (fromIndex, toIndex) => {
   }
 
   // if both cards' suits' color are same, they cannot move
-  if (suitColorMap[fromCard.suit] === suitColorMap[toCard.suit]) {
+  if (suitNameColorMap[fromCard.suit.name] === suitNameColorMap[toCard.suit.name]) {
     return false;
   }
   // to card's index should be 1 above from card's index
@@ -214,10 +189,10 @@ export const canMoveOver = (fromIndex, toIndex) => {
 /**
  * Find the longest stack possible (from the end) in this cascade
  *
- * @param {int[]} cascade  Cascade from which stack will be extracted
- * @returns {int[]} stack of cards
+ * @param {number[]} cascade  Cascade from which stack will be extracted
+ * @returns {number[]} stack of cards
  */
-export const getStackFromCascade = (cascade) => {
+export const getStackFromCascade = (cascade: number[]) => {
   if (!cascade) {
     return [];
   }
@@ -228,7 +203,7 @@ export const getStackFromCascade = (cascade) => {
 
   const stack = transform(
     cascadeCopy,
-    (acc, curr) => {
+    (acc: number[], curr) => {
       if (!acc.length) {
         acc.push(curr);
         return true;
@@ -250,22 +225,16 @@ export const getStackFromCascade = (cascade) => {
 };
 
 /**
- * Result of foundation check
- *
- * @typedef {Object} MoveToFoundationCheckResult
- * @property {int} index - Index of the foundation. Can be -1 if none found
- * @property {boolean} canMove - Indicates if the card can move to `index`.
- * @property {boolean} shouldMove - Indicates if the card should move to `index`.
- */
-
-/**
  * Check if given card can be moved to any of the foundation cell
  *
  * @param {int[]} foundations Foundation array
  * @param {int} cardIndex Card index to check
  * @returns {MoveToFoundationCheckResult} Result
  */
-export const canMoveToFoundation = (foundations, cardIndex) => {
+export const canMoveToFoundation: (
+  foundations: number[],
+  cardIndex: number
+) => MoveToFoundationCheckResult = (foundations, cardIndex) => {
   if (isNil(cardIndex)) {
     return {
       index: -1,
@@ -275,6 +244,13 @@ export const canMoveToFoundation = (foundations, cardIndex) => {
   }
   // console.log(foundations, cardIndex);
   const card = indexToCard(cardIndex);
+  if (!card) {
+    return {
+      index: -1,
+      canMove: false,
+      shouldMove: false,
+    };
+  }
   if (card.indexInSuit === 0) {
     // got ace, can be moved to the first empty foundation we find
     return {
@@ -321,18 +297,18 @@ export const canMoveToFoundation = (foundations, cardIndex) => {
 
   // check if cards movable on the current card have been moved to foundation already
 
-  const cardColor = suitColorMap[card.suit];
+  const cardColor = suitNameColorMap[card.suit.name];
   const checkColor = cardColor === 'red' ? 'black' : 'red';
-  const checkSuits = Object.entries(suitColorMap)
+  const checkSuits = Object.entries(suitNameColorMap)
     .filter(([, color]) => color === checkColor)
     .map(([s]) => s);
   const checkIndexInSuit = card.indexInSuit - 1;
 
   // console.log(checkColor, checkSuits, checkIndexInSuit);
 
-  const allMoved = foundationCards.filter((f) => (
-    f && checkSuits.includes(f.suit) && f.indexInSuit >= checkIndexInSuit
-  )).length === 2;
+  const allMoved = foundationCards.filter((f) => (f
+    && checkSuits.includes(f.suit.name)
+    && f.indexInSuit >= checkIndexInSuit)).length === 2;
 
   // console.log(allMoved);
 
@@ -343,17 +319,21 @@ export const canMoveToFoundation = (foundations, cardIndex) => {
   };
 };
 
-function emptyCellsCount(openCards) {
+function emptyCellsCount(openCards: number[]) {
   return openCards.filter((c) => isNil(c)).length;
 }
 
-function emptyCascadesCount(cascades) {
+function emptyCascadesCount(cascades: number[][]) {
   return cascades.filter((c) => !c.length).length;
 }
 
-export function movableCardCount(openCards, cascades, toCascadeIndex) {
+export function movableCardCount(
+  openCards: number[],
+  cascades: number[][],
+  toCascadeIndex: number,
+) {
   let emptyCascadesCountVal = emptyCascadesCount(cascades);
-  if (toCascadeIndex >= 0 && emptyCascadesCount > 0) {
+  if (toCascadeIndex >= 0 && emptyCascadesCountVal > 0) {
     // check if the toCascade is one of the empty cascades
     const isToEmpty = cascades[toCascadeIndex].length === 0;
     // console.log(isToEmpty);
@@ -366,11 +346,11 @@ export function movableCardCount(openCards, cascades, toCascadeIndex) {
   return 2 ** emptyCascadesCountVal * (emptyCellsCount(openCards) + 1);
 }
 
-export function findCascadeIndex(cascades, cardIndex) {
+export function findCascadeIndex(cascades: number[][], cardIndex: number) {
   return cascades.findIndex((c) => c.includes(cardIndex));
 }
 
-export function checkIfWon(foundationCards) {
+export function checkIfWon(foundationCards: number[]) {
   return !!(
     foundationCards
     && foundationCards
