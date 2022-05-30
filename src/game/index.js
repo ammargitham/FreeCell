@@ -13,8 +13,8 @@ import {
   storeGameState,
   checkIfWon,
 } from './helper';
-import { dbManager } from '../db';
 import GameResult from '../db/GameResult';
+import { GameResultStatus } from '../db/FreeCellDatabase';
 
 export const initialState = {
   loading: true,
@@ -448,16 +448,17 @@ const useFreeCellGame = () => {
 
     if (!loaded) {
       // if a new game was generated, save it to db
-      dbManager
-        .addOrUpdateGameResultByGameNum(
-          new GameResult(
-            null,
+      GameResult.getByGameNum(gotState.gameNum)
+        .then((gameResult) => {
+          const newGameResult = new GameResult(
             gotState.gameNum,
             0,
             0,
-            GameResult.Status.NOT_COMPLETED,
-          ),
-        )
+            GameResultStatus.NOT_COMPLETED,
+            gameResult.id ? gameResult.id : undefined,
+          );
+          return newGameResult.save();
+        })
         .catch((err) => {
           console.error(err);
         });
@@ -506,16 +507,17 @@ const useFreeCellGame = () => {
       state: gotState,
     });
 
-    dbManager
-      .addOrUpdateGameResultByGameNum(
-        new GameResult(
-          null,
+    GameResult.getByGameNum(gotState.gameNum)
+      .then((gameResult) => {
+        const newGameResult = new GameResult(
           gotState.gameNum,
           0,
           0,
-          GameResult.Status.NOT_COMPLETED,
-        ),
-      )
+          GameResultStatus.NOT_COMPLETED,
+          gameResult.id ? gameResult.id : undefined,
+        );
+        return newGameResult.save();
+      })
       .catch((err) => {
         console.error(err);
       });
