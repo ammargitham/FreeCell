@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { isNil } from 'lodash';
 
 import Card from './Card';
 import { indexToCard } from '../game/helper';
@@ -26,15 +25,22 @@ type CardCellProps = {
 export default function CardCell({
   card, className, isActive, onClick,
 }: CardCellProps) {
-  return !isNil(card) ? (
+  let c;
+  if (card !== undefined) {
+    c = indexToCard(card);
+  }
+  if (c === undefined) {
+    return (
+      <EmptyCell
+        className={`${className || ''} ${onClick ? 'clickable' : ''}`}
+        onClick={onClick}
+      />
+    );
+  }
+  return (
     <Card
       className={`${className || ''} ${isActive && 'active'}`}
-      card={indexToCard(card)}
-      onClick={onClick}
-    />
-  ) : (
-    <EmptyCell
-      className={`${className || ''} ${onClick ? 'clickable' : ''}`}
+      card={c}
       onClick={onClick}
     />
   );

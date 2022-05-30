@@ -97,6 +97,9 @@ export default function Cascade({ cards = [], activeCard, onCascadeClick }: Casc
     >
       {cards.map((card, i) => {
         const actual = indexToCard(card);
+        if (!actual) {
+          return null;
+        }
         const isActive = activeCard === card;
         return (
           <Card

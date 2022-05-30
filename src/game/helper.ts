@@ -82,8 +82,8 @@ export const getRandomCascades = (gameNum: number) => {
  */
 export const generateNewGameState = (
   initialState: any,
-  gameNum: number | null,
-  loadFromStorage: boolean,
+  gameNum: number | null = null,
+  loadFromStorage: boolean = false,
 ) => {
   if (loadFromStorage) {
     const loadedState = getStoredGameState();
@@ -124,7 +124,10 @@ export const generateNewGameState = (
 
 const endRanks: JackQueenKing[] = ['jack', 'queen', 'king'];
 
-export const indexToCard: (index: number) => Card = (index) => {
+export const indexToCard: (index: number) => Card | undefined = (index) => {
+  if (index < 0 || index > 52) {
+    return undefined;
+  }
   const row = Math.floor(index / 13);
   const col = index % 13;
 
@@ -161,8 +164,11 @@ export const cardToIndex = (card: Card) => {
   return 13 * suitIndex + rankIndex;
 };
 
-export const canMoveOver = (fromIndex: number, toIndex?: number) => {
-  if (toIndex == null) {
+export const canMoveOver = (fromIndex?: number | null, toIndex?: number | null) => {
+  if (isNil(fromIndex)) {
+    return false;
+  }
+  if (isNil(toIndex)) {
     // we can move to an empty cascade
     return true;
   }
@@ -227,14 +233,14 @@ export const getStackFromCascade = (cascade: number[]) => {
 /**
  * Check if given card can be moved to any of the foundation cell
  *
- * @param {int[]} foundations Foundation array
- * @param {int} cardIndex Card index to check
+ * @param {Array<number | undefined | null>} foundations Foundation array
+ * @param {number} cardIndex Card index to check
  * @returns {MoveToFoundationCheckResult} Result
  */
-export const canMoveToFoundation: (
-  foundations: number[],
-  cardIndex: number
-) => MoveToFoundationCheckResult = (foundations, cardIndex) => {
+export function canMoveToFoundation(
+  foundations: Array<number | undefined>,
+  cardIndex: number,
+): MoveToFoundationCheckResult {
   if (isNil(cardIndex)) {
     return {
       index: -1,
@@ -259,7 +265,12 @@ export const canMoveToFoundation: (
       shouldMove: true,
     };
   }
-  const foundationCards = foundations.map(indexToCard);
+  const foundationCards = foundations.map((f) => {
+    if (isNil(f)) {
+      return undefined;
+    }
+    return indexToCard(f);
+  });
 
   // console.log(foundationCards, card);
 
@@ -317,7 +328,7 @@ export const canMoveToFoundation: (
     canMove: true,
     shouldMove: allMoved,
   };
-};
+}
 
 function emptyCellsCount(openCards: number[]) {
   return openCards.filter((c) => isNil(c)).length;
