@@ -25,16 +25,20 @@ describe('db tests', () => {
       GameResultStatus.NOT_COMPLETED,
     );
     const savedGameResult = await gameResult.save();
+    expect(savedGameResult.id).toBeDefined();
+    expect(savedGameResult.id).not.toBeNull();
     expect(savedGameResult.gameNum).toEqual(gameNum);
     expect(savedGameResult.gameNum).toEqual(gameResult.gameNum);
     expect(savedGameResult.moveCount).toEqual(gameResult.moveCount);
     expect(savedGameResult.elapsedTime).toEqual(gameResult.elapsedTime);
 
-    const byId = await GameResult.get(savedGameResult.id);
+    const byId = await GameResult.get(savedGameResult.id!);
     expect(byId).toBeInstanceOf(GameResult);
     expect(byId).toStrictEqual((savedGameResult));
 
     const byGameNum = await GameResult.getByGameNum(gameNum);
+    expect(byGameNum).toBeDefined();
+    expect(byGameNum).not.toBeNull();
     expect(byGameNum).toBeInstanceOf(GameResult);
     expect(byGameNum).toEqual(objectContaining(savedGameResult));
   });
@@ -51,15 +55,18 @@ describe('db tests', () => {
     await gameResult.save();
 
     // game won
-    let byGameNum = await GameResult.getByGameNum(gameNum);
+    let byGameNumI = await GameResult.getByGameNum(gameNum);
+    expect(byGameNumI).toBeInstanceOf(GameResult);
+    const byGameNum = <GameResult>byGameNumI;
     byGameNum.status = GameResultStatus.WON;
     byGameNum.moveCount = 50;
     byGameNum.elapsedTime = 1000;
     await byGameNum.save();
-    byGameNum = await GameResult.getByGameNum(gameNum);
-    expect(byGameNum.status).toEqual(GameResultStatus.WON);
-    expect(byGameNum.moveCount).toEqual(50);
-    expect(byGameNum.elapsedTime).toEqual(1000);
+    byGameNumI = await GameResult.getByGameNum(gameNum);
+    expect(byGameNumI).toBeInstanceOf(GameResult);
+    expect(byGameNumI!.status).toEqual(GameResultStatus.WON);
+    expect(byGameNumI!.moveCount).toEqual(50);
+    expect(byGameNumI!.elapsedTime).toEqual(1000);
   });
 
   test('statistics', async () => {
