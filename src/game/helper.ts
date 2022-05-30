@@ -82,8 +82,8 @@ export const getRandomCascades = (gameNum: number) => {
  */
 export const generateNewGameState = (
   initialState: any,
-  gameNum: number | null = null,
-  loadFromStorage: boolean = false,
+  gameNum?: number,
+  loadFromStorage?: boolean,
 ) => {
   if (loadFromStorage) {
     const loadedState = getStoredGameState();
@@ -164,11 +164,8 @@ export const cardToIndex = (card: Card) => {
   return 13 * suitIndex + rankIndex;
 };
 
-export const canMoveOver = (fromIndex?: number | null, toIndex?: number | null) => {
-  if (isNil(fromIndex)) {
-    return false;
-  }
-  if (isNil(toIndex)) {
+export const canMoveOver = (fromIndex: number, toIndex?: number) => {
+  if (toIndex === undefined) {
     // we can move to an empty cascade
     return true;
   }
@@ -233,7 +230,7 @@ export const getStackFromCascade = (cascade: number[]) => {
 /**
  * Check if given card can be moved to any of the foundation cell
  *
- * @param {Array<number | undefined | null>} foundations Foundation array
+ * @param {Array<number | undefined>} foundations Foundation array
  * @param {number} cardIndex Card index to check
  * @returns {MoveToFoundationCheckResult} Result
  */
