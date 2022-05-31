@@ -1,28 +1,19 @@
-import {
-  useReducer, useCallback, useEffect, useMemo, useState,
-} from 'react';
 import { cloneDeep, isNil } from 'lodash';
+import { GameState, Action } from './types';
 
 import {
   canMoveOver,
   getStackFromCascade,
   canMoveToFoundation,
-  generateNewGameState,
   findCascadeIndex,
   movableCardCount,
-  storeGameState,
-  checkIfWon,
 } from './helper';
-import GameResult from '../db/GameResult';
-import { GameResultStatus } from '../db/FreeCellDatabase';
 
-export const initialState = {
+export const initialState: GameState = {
   loading: true,
-  gameNum: null,
   openCards: Array.from({ length: 4 }),
   foundationCards: Array.from({ length: 4 }),
   cascades: [],
-  activeCard: null,
   history: [],
   moveCount: 0,
   wasLastUndo: false,
@@ -30,21 +21,9 @@ export const initialState = {
   paused: true,
 };
 
-const actions = {
-  reset: 'reset',
-  newGame: 'newGame',
-  setState: 'setState',
-  undo: 'undo',
-  openCellClick: 'openCellClick',
-  onMove: 'onMove',
-  onCascadeClick: 'onCascadeClick',
-  updateElapsedTime: 'updateElapsedTime',
-  setPaused: 'setPaused',
-};
-
-const reducer = (state, action) => {
+export default function reducer(state: GameState, action: Action): GameState {
   switch (action.type) {
-    case actions.reset: {
+    case 'reset': {
       if (!state.history || state.history.length <= 0) {
         return state;
       }
@@ -61,10 +40,10 @@ const reducer = (state, action) => {
         history: updatedHistory,
       };
     }
-    case actions.setState: {
+    case 'set_state': {
       return action.state;
     }
-    case actions.undo: {
+    case 'undo': {
       if (!state.history || state.history.length <= 1) {
         return state;
       }
@@ -83,7 +62,7 @@ const reducer = (state, action) => {
         wasLastUndo: true,
       };
     }
-    case actions.openCellClick: {
+    case 'open_cell_click': {
       const openCellCard = state.openCards[action.cellIndex];
       const updatedOpenCards = [...state.openCards] || Array.from({ length: 4 });
       // if there is an active card
@@ -92,7 +71,7 @@ const reducer = (state, action) => {
         if (openCellCard) {
           return {
             ...state,
-            activeCard: null,
+            activeCard: undefined,
           };
         }
         // else move the active card to the open cell
@@ -127,7 +106,7 @@ const reducer = (state, action) => {
           ...state,
           openCards: updatedOpenCards,
           cascades: updatedCascades,
-          activeCard: null,
+          activeCard: undefined,
           moveCount: state.moveCount + 1,
           history: updatedHistory,
           wasLastUndo: false,
@@ -136,10 +115,10 @@ const reducer = (state, action) => {
       // no active card, if current clicked open cell has a card, make it active
       return {
         ...state,
-        activeCard: openCellCard || null,
+        activeCard: openCellCard,
       };
     }
-    case actions.onCascadeClick: {
+    case 'cascade_click': {
       // console.log("on cascade click", action.cascadeIndex);
 
       if (state.activeCard) {
@@ -149,7 +128,7 @@ const reducer = (state, action) => {
         );
 
         // from stack is the stack of cards to move from one place to another
-        let fromStack;
+        let fromStack: number[];
         let fromCascadeIndex = -1;
         const toCascadeIndex = action.cascadeIndex;
 
@@ -171,7 +150,7 @@ const reducer = (state, action) => {
             // same cascade clicked, deactivate the active card
             return {
               ...state,
-              activeCard: null,
+              activeCard: undefined,
             };
           }
 
@@ -193,7 +172,7 @@ const reducer = (state, action) => {
         let canMove;
 
         const toCascade = state.cascades[toCascadeIndex];
-        const toCard = toCascade.length === 0 ? null : toCascade[toCascade.length - 1];
+        const toCard = toCascade.length === 0 ? undefined : toCascade[toCascade.length - 1];
 
         for (i = 0; i < fromStack.length; i += 1) {
           // we need to check if card in the fromStack is movable to the next card
@@ -210,7 +189,7 @@ const reducer = (state, action) => {
         if (!canMove) {
           return {
             ...state,
-            activeCard: null,
+            activeCard: undefined,
           };
         }
 
@@ -220,7 +199,7 @@ const reducer = (state, action) => {
         // if from card was from open cell, remove it
         if (openCellIndex >= 0) {
           updatedOpenCards = [...state.openCards];
-          updatedOpenCards[openCellIndex] = null;
+          updatedOpenCards[openCellIndex] = undefined;
         } else {
           const fromCascade = state.cascades[fromCascadeIndex];
           fromStack = fromStack.splice(i);
@@ -238,7 +217,7 @@ const reducer = (state, action) => {
         const updatedCascades = cloneDeep(state.cascades);
 
         // update the from and to cascades in the cascades copy using index
-        if (fromCascadeIndex >= 0) {
+        if (fromCascadeIndex >= 0 && updatedFromCascade !== undefined) {
           updatedCascades[fromCascadeIndex] = updatedFromCascade;
         }
         updatedCascades[toCascadeIndex] = updatedToCascade;
@@ -254,7 +233,7 @@ const reducer = (state, action) => {
           ...state,
           cascades: updatedCascades,
           openCards: updatedOpenCards,
-          activeCard: null,
+          activeCard: undefined,
           moveCount: state.moveCount + 1,
           history: updatedHistory,
           wasLastUndo: false,
@@ -272,37 +251,29 @@ const reducer = (state, action) => {
         ...state,
         activeCard: lastCard,
       };
-
-      // // first check if active card in open cell or another cascade
-      // const openCellIndex = state.openCards.findIndex(c => c === state.activeCard)
-      // const fromCascadeIndex = findCascadeIndex(state.cascades, state.activeCard)
-
-      // if (openCellIndex >= 0) {
-      //   // move from open cell to this cascade
-
-      // } else if (fromCascadeIndex >= 0) {
-      //   // move from fromCascade to this cascade
-
-      // } else {
-      //   // not possible to reach here if everything normal
-      //   return state;
-      // }
     }
-    case actions.onMove: {
+    case 'move': {
       if (state.wasLastUndo) {
         return state;
       }
       // on any move, check for cards which 'should' move to foundation
       let bottomCards = state.cascades.map((c) => {
         if (!c || !c.length) {
-          return null;
+          return undefined;
         }
         return c[c.length - 1];
       });
 
-      // console.log(bottomCards);
-
-      let moveResults = bottomCards.map((b) => canMoveToFoundation(state.foundationCards, b));
+      let moveResults = bottomCards.map((b) => {
+        if (b === undefined) {
+          return {
+            index: -1,
+            canMove: false,
+            shouldMove: false,
+          };
+        }
+        return canMoveToFoundation(state.foundationCards, b);
+      });
 
       let firstMovableIndex = moveResults.findIndex((m) => m.shouldMove);
 
@@ -314,7 +285,16 @@ const reducer = (state, action) => {
       if (firstMovableIndex < 0) {
         // check if any open cell card should be moved
         bottomCards = state.openCards;
-        moveResults = bottomCards.map((c) => canMoveToFoundation(state.foundationCards, c));
+        moveResults = bottomCards.map((c) => {
+          if (c === undefined) {
+            return {
+              index: -1,
+              canMove: false,
+              shouldMove: false,
+            };
+          }
+          return canMoveToFoundation(state.foundationCards, c);
+        });
 
         firstMovableIndex = moveResults.findIndex((m) => m.shouldMove);
 
@@ -328,7 +308,7 @@ const reducer = (state, action) => {
 
         // remove the from card from the open cell
         updatedOpenCards = [...state.openCards];
-        updatedOpenCards[firstMovableIndex] = null;
+        updatedOpenCards[firstMovableIndex] = undefined;
       } else {
         // move from cascade to foundation
 
@@ -365,217 +345,24 @@ const reducer = (state, action) => {
         wasLastUndo: false,
       };
     }
-    case actions.updateElapsedTime: {
+    case 'update_elapsed_time': {
       return {
         ...state,
         elapsedTime: action.elapsedTime,
       };
     }
-    case actions.setPaused: {
+    case 'pause': {
       return {
         ...state,
         paused: action.paused,
       };
     }
-    default:
+    case 'new_game':
       return state;
+    default: {
+      // Note if there is an error below, it means all cases have not been handled above
+      const exhaustiveCheck: never = action;
+      return exhaustiveCheck;
+    }
   }
-};
-
-const useFreeCellGame = () => {
-  const [state, dispatch] = useReducer(reducer, initialState);
-  const [canStartTimer, setCanStartTimer] = useState(false);
-
-  // keeping a separate paused state, so that its is not written to local storage
-  // const [timerState, setTimerState] = useState({
-  //   startAt: 0,
-  //   paused: true,
-  // });
-
-  // const { elapsedTime, reset: resetTimer } = useElapsedTime({
-  //   isPlaying: !state.paused,
-  //   startAt: 0,
-  //   updateInterval: 1,
-  // });
-
-  // const { time, start, pause, reset: resetTimer, status } = useTimer({
-  //   initialTime: state.elapsedTime,
-  // });
-
-  // useEffect(() => {
-  //   if (state.loading || state.paused || !canStartTimer) {
-  //     return;
-  //   }
-  //   console.log(time);
-  //   // dispatch({
-  //   //   type: actions.updateElapsedTime,
-  //   //   elapsedTime: time,
-  //   // });
-  // }, [canStartTimer, state.loading, state.paused, time]);
-
-  // useEffect(() => {
-  //   if (state.loading || state.paused || !canStartTimer) {
-  //     pause();
-  //     return;
-  //   }
-  //   start();
-  // }, [state.paused, state.loading, canStartTimer, start, pause]);
-
-  useEffect(() => {
-    // generate or load game
-    const { state: gotState, loaded } = generateNewGameState(
-      initialState,
-      null,
-      true,
-    );
-    // set its loading to false
-    gotState.loading = false;
-    gotState.paused = false;
-
-    if (loaded) {
-      // check if won or lost, if not resume the timer
-      const hasWon = checkIfWon(gotState.foundationCards);
-      if (hasWon) {
-        gotState.paused = true;
-      }
-    }
-
-    // dispatch it to reducer
-    dispatch({
-      type: actions.setState,
-      state: gotState,
-    });
-
-    if (!loaded) {
-      // if a new game was generated, save it to db
-      GameResult.getByGameNum(gotState.gameNum)
-        .then((gameResult) => {
-          const newGameResult = new GameResult(
-            gotState.gameNum,
-            0,
-            0,
-            GameResultStatus.NOT_COMPLETED,
-            gameResult.id ? gameResult.id : undefined,
-          );
-          return newGameResult.save();
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    }
-  }, []);
-
-  const canUndo = useMemo(() => state.history && state.history.length > 1, [
-    state.history,
-  ]);
-
-  /* game has been won when all cards in foundation are kings */
-  const hasWon = useMemo(() => checkIfWon(state.foundationCards), [
-    state.foundationCards,
-  ]);
-
-  useEffect(() => {
-    if (state.loading) {
-      return;
-    }
-    // save state on any change
-    storeGameState(state);
-  }, [state]);
-
-  useEffect(() => {
-    if (isNil(state.history)) {
-      return;
-    }
-    dispatch({
-      type: actions.onMove,
-    });
-  }, [state.history]);
-
-  const reset = useCallback(() => {
-    dispatch({
-      type: actions.reset,
-    });
-  }, []);
-
-  const newGame = useCallback(() => {
-    const { state: gotState } = generateNewGameState(initialState, null, false);
-    // set its loading to false
-    gotState.loading = false;
-    // dispatch it to reducer
-    dispatch({
-      type: actions.setState,
-      state: gotState,
-    });
-
-    GameResult.getByGameNum(gotState.gameNum)
-      .then((gameResult) => {
-        const newGameResult = new GameResult(
-          gotState.gameNum,
-          0,
-          0,
-          GameResultStatus.NOT_COMPLETED,
-          gameResult.id ? gameResult.id : undefined,
-        );
-        return newGameResult.save();
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }, []);
-
-  useEffect(() => {
-    // if (!hasWon) {
-    // }
-    // dispatch({
-    //   type: actions.setPaused,
-    //   paused: true,
-    // });
-    //   const updateResult = async () => {
-    //     const existing = await dbManager.getGameResultByGameNum(state.gameNum);
-    //     console.log(existing);
-    //     let gameResult = existing;
-    //     if (!existing) {
-    //       gameResult = new GameResult(
-    //         null,
-    //         state.gameNum,
-    //         state.
-    //       )
-    //     }
-    //   };
-    //   updateResult().catch((err) => console.log(err));
-  }, [hasWon]);
-
-  const undo = useCallback(() => {
-    dispatch({
-      type: actions.undo,
-    });
-  }, []);
-
-  const onOpenCellClick = useCallback((cellIndex) => {
-    dispatch({
-      type: actions.openCellClick,
-      cellIndex,
-    });
-  }, []);
-
-  const onCascadeClick = useCallback((cascadeIndex) => {
-    dispatch({
-      type: actions.onCascadeClick,
-      cascadeIndex,
-    });
-  }, []);
-
-  return [
-    state,
-    canUndo,
-    hasWon,
-    reset,
-    newGame,
-    undo,
-    onOpenCellClick,
-    onCascadeClick,
-    setCanStartTimer,
-  ];
-};
-
-export default useFreeCellGame;
+}

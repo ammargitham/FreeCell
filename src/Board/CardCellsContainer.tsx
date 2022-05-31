@@ -36,7 +36,7 @@ const Container = styled.div`
 `;
 
 type CardCellsContainerProps = {
-  cards?: Array<number>,
+  cards?: Array<number | undefined>,
   activeCard?: number,
   cellClickable?: (index: number) => boolean,
   onCellClick?: (index: number) => void,

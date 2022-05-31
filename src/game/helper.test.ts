@@ -1,4 +1,4 @@
-import { initialState } from './index';
+import { initialState } from './reducer';
 import {
   indexToCard,
   cardToIndex,

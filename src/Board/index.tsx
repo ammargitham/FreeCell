@@ -51,9 +51,9 @@ type BoardBoardProps = {
   canUndo: boolean,
   hasWon: boolean,
   activeCard?: number,
-  openCards: Array<number>,
-  foundationCards: Array<number>,
-  cascades: Array<Array<number>>,
+  openCards: Array<number | undefined>,
+  foundationCards: Array<number | undefined>,
+  cascades: number[][],
   moveCount: number,
   elapsedTime: number,
 };

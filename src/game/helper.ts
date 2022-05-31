@@ -327,8 +327,8 @@ export function canMoveToFoundation(
   };
 }
 
-function emptyCellsCount(openCards: number[]) {
-  return openCards.filter((c) => isNil(c)).length;
+function emptyCellsCount(openCards: Array<number | undefined>) {
+  return openCards.filter((c) => c === undefined).length;
 }
 
 function emptyCascadesCount(cascades: number[][]) {
@@ -336,7 +336,7 @@ function emptyCascadesCount(cascades: number[][]) {
 }
 
 export function movableCardCount(
-  openCards: number[],
+  openCards: Array<number | undefined>,
   cascades: number[][],
   toCascadeIndex: number,
 ) {
@@ -358,11 +358,12 @@ export function findCascadeIndex(cascades: number[][], cardIndex: number) {
   return cascades.findIndex((c) => c.includes(cardIndex));
 }
 
-export function checkIfWon(foundationCards: number[]) {
+export function checkIfWon(foundationCards: Array<number | undefined>) {
   return !!(
     foundationCards
+    && foundationCards.every((c) => c !== undefined)
     && foundationCards
-      .map((c) => indexToCard(c))
-      .every((c) => c && c.rank === 'king')
+      .map((c) => indexToCard(c!))
+      .every((c) => c?.rank === 'king')
   );
 }
