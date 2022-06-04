@@ -21,6 +21,24 @@ const ButtonsContainer = styled.div`
   }
 `;
 
+const InfoContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  color: white;
+  font-weight: bold;
+  font-size: 1.5rem;
+  text-shadow: 0px 1px 0px #000000;
+
+  & > *:not(:first-child) {
+    margin-left: 1rem;
+  }
+
+  & span.label {
+    margin-right: 0.2rem;
+  }
+`;
+
 type ActionsProps = {
   canUndo: boolean,
   isPaused: boolean,
@@ -73,14 +91,16 @@ export default function Actions({
           New Game
         </button>
       </ButtonsContainer>
-      <span>
-        Moves:
-        {moveCount}
-      </span>
-      <span>
-        Time:
-        {formatSeconds(elapsedTime)}
-      </span>
+      <InfoContainer>
+        <span>
+          <span className="label">Time:</span>
+          {formatSeconds(elapsedTime)}
+        </span>
+        <span>
+          <span className="label">Moves:</span>
+          {moveCount}
+        </span>
+      </InfoContainer>
     </Container>
   );
 }
