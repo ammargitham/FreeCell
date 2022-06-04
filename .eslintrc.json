@@ -42,7 +42,7 @@
             "files": ["*.js","*.tsx", "*.ts"],
             "rules": {
               "react/require-default-props": "off",
-              "no-console": ["error", { "allow": ["warn", "error"] }],
+              "no-console": ["warn", { "allow": ["warn", "error"] }],
               "@typescript-eslint/no-unused-vars": "warn",
               "no-useless-return": "warn"
             }
