@@ -3,6 +3,7 @@ import seedrandom from 'seedrandom';
 import {
   Card, CardRank, JackQueenKing, MoveToFoundationCheckResult, suitNameColorMap, suitNames, suits,
 } from '../globals/types';
+import { GameState } from './types';
 
 export const minGameNum = 1;
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER#polyfill
@@ -11,17 +12,31 @@ export const maxGameNum = Number.MAX_SAFE_INTEGER || 9007199254740991; // Math.p
 export const getGameNumFromRandom = (random: number) => minGameNum
   + Math.round(random * (maxGameNum - minGameNum + 1));
 
-export const storeGameState = (state: any) => {
+export const storeGameState = (state: GameState) => {
   localStorage.setItem('state', JSON.stringify(state));
 };
 
-const getStoredGameState = () => {
-  const state = localStorage.getItem('state');
-  if (!state) {
+function nullsToUndefined<T>(arr: Array<T | null>): Array<T | undefined> {
+  return arr.map((c) => (c === null ? undefined : c));
+}
+
+const getStoredGameState = (): GameState | null => {
+  const stateString = localStorage.getItem('state');
+  if (!stateString) {
     return null;
   }
   try {
-    return JSON.parse(state);
+    const state: GameState = JSON.parse(stateString);
+    // convert nulls to undefined
+    state.history = state.history.map((h) => {
+      const newH = h;
+      newH.openCards = nullsToUndefined(newH.openCards);
+      newH.foundationCards = nullsToUndefined(newH.foundationCards);
+      return newH;
+    });
+    state.openCards = nullsToUndefined(state.openCards);
+    state.foundationCards = nullsToUndefined(state.foundationCards);
+    return state;
   } catch (err) {
     return null;
   }
@@ -29,6 +44,7 @@ const getStoredGameState = () => {
 
 // https://stackoverflow.com/questions/16801687/javascript-random-ordering-with-seed
 const shuffle = (array: any[], rndGen: seedrandom.PRNG) => {
+  // TODO Create copy before shuffling
   let m = array.length;
   let t;
   let i;
@@ -84,7 +100,7 @@ export const generateNewGameState = (
   initialState: any,
   gameNum?: number,
   loadFromStorage?: boolean,
-) => {
+): { loaded: boolean, state: GameState } => {
   if (loadFromStorage) {
     const loadedState = getStoredGameState();
     // console.log(loadedState);
