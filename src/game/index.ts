@@ -118,26 +118,39 @@ export default function useFreeCellGame() : [
   }, [state.history]);
 
   useEffect(() => {
-    // if (!hasWon) {
-    // }
-    // dispatch({
-    //   type: actions.setPaused,
-    //   paused: true,
-    // });
-    //   const updateResult = async () => {
-    //     const existing = await dbManager.getGameResultByGameNum(state.gameNum);
-    //     console.log(existing);
-    //     let gameResult = existing;
-    //     if (!existing) {
-    //       gameResult = new GameResult(
-    //         null,
-    //         state.gameNum,
-    //         state.
-    //       )
-    //     }
-    //   };
-    //   updateResult().catch((err) => console.log(err));
-  }, []);
+    if (!hasWon) {
+      return;
+    }
+    dispatch({
+      type: 'pause',
+      paused: true,
+    });
+    const updateResult = async () => {
+      const { gameNum } = state;
+      if (gameNum === undefined) {
+        return;
+      }
+      let gameResult = <GameResult> await GameResult.getByGameNum(gameNum);
+      if (gameResult && gameResult.status === GameResultStatus.WON) {
+        // already updated
+        return;
+      }
+      if (!gameResult) {
+        gameResult = new GameResult(
+          gameNum,
+          state.elapsedTime,
+          state.moveCount,
+          GameResultStatus.WON,
+        );
+      } else {
+        gameResult.elapsedTime = state.elapsedTime;
+        gameResult.moveCount = state.moveCount;
+        gameResult.status = GameResultStatus.WON;
+      }
+      await gameResult.save();
+    };
+    updateResult().catch((err) => console.error(err));
+  }, [hasWon, state]);
 
   const reset = useCallback(() => {
     resetTimer();
