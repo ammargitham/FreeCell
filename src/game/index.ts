@@ -1,62 +1,35 @@
 import {
   useReducer, useCallback, useEffect, useMemo, useState, Reducer,
 } from 'react';
-import { isNil } from 'lodash';
 
-import { generateNewGameState, checkIfWon } from './helper';
+import { generateNewGameState, checkIfWon, storeGameState } from './helper';
 import GameResult from '../db/GameResult';
 import { GameResultStatus } from '../db/FreeCellDatabase';
 import reducer, { initialState } from './reducer';
 import { Action, GameState } from './types';
+import useTimer from '../utils/useTimer';
 
 export default function useFreeCellGame() : [
-  GameState,
-  boolean,
-  boolean,
-  () => void,
-  () => void,
-  () => void,
-  (cellIndex: number) => void,
-  (cellIndex: number) => void,
-  React.Dispatch<React.SetStateAction<boolean>>,
+  state: GameState,
+  canUndo: boolean,
+  hasWon: boolean,
+  togglePause: () => void,
+  reset: () => void,
+  newGame: () => void,
+  undo: () => void,
+  onOpenCellClick: (cellIndex: number) => void,
+  onCascadeClick: (cellIndex: number) => void,
+  setCanStartTimerWrapper: (canStart: boolean) => void,
 ] {
   const [state, dispatch] = useReducer<Reducer<GameState, Action>>(reducer, initialState);
   const [canStartTimer, setCanStartTimer] = useState(false);
-
-  // keeping a separate paused state, so that its is not written to local storage
-  // const [timerState, setTimerState] = useState({
-  //   startAt: 0,
-  //   paused: true,
-  // });
-
-  // const { elapsedTime, reset: resetTimer } = useElapsedTime({
-  //   isPlaying: !state.paused,
-  //   startAt: 0,
-  //   updateInterval: 1,
-  // });
-
-  // const { time, start, pause, reset: resetTimer, status } = useTimer({
-  //   initialTime: state.elapsedTime,
-  // });
-
-  // useEffect(() => {
-  //   if (state.loading || state.paused || !canStartTimer) {
-  //     return;
-  //   }
-  //   console.log(time);
-  //   // dispatch({
-  //   //   type: actions.updateElapsedTime,
-  //   //   elapsedTime: time,
-  //   // });
-  // }, [canStartTimer, state.loading, state.paused, time]);
-
-  // useEffect(() => {
-  //   if (state.loading || state.paused || !canStartTimer) {
-  //     pause();
-  //     return;
-  //   }
-  //   start();
-  // }, [state.paused, state.loading, canStartTimer, start, pause]);
+  const {
+    time: elapsedTime,
+    start: startTimer,
+    pause: pauseTimer,
+    reset: resetTimer,
+    // status: timerStatue,
+  } = useTimer();
 
   useEffect(() => {
     // generate or load game
@@ -75,6 +48,7 @@ export default function useFreeCellGame() : [
       if (hasWon) {
         gotState.paused = true;
       }
+      resetTimer(gotState.elapsedTime, false);
     }
 
     // dispatch it to reducer
@@ -83,12 +57,13 @@ export default function useFreeCellGame() : [
       state: gotState,
     });
 
-    if (!loaded) {
+    const { gameNum } = gotState;
+    if (!loaded && gameNum !== undefined) {
       // if a new game was generated, save it to db
-      GameResult.getByGameNum(gotState.gameNum)
+      GameResult.getByGameNum(gameNum)
         .then((gameResult) => {
           const newGameResult = new GameResult(
-            gotState.gameNum,
+            gameNum,
             0,
             0,
             GameResultStatus.NOT_COMPLETED,
@@ -100,7 +75,7 @@ export default function useFreeCellGame() : [
           console.error(err);
         });
     }
-  }, []);
+  }, [resetTimer]);
 
   const canUndo = useMemo(() => state.history && state.history.length > 1, [state.history]);
 
@@ -108,53 +83,39 @@ export default function useFreeCellGame() : [
   const hasWon = useMemo(() => checkIfWon(state.foundationCards), [state.foundationCards]);
 
   useEffect(() => {
+    if (!canStartTimer) {
+      return;
+    }
+    if (state.paused) {
+      pauseTimer();
+      return;
+    }
+    startTimer();
+  }, [canStartTimer, pauseTimer, startTimer, state.paused]);
+
+  useEffect(() => {
+    dispatch({
+      type: 'update_elapsed_time',
+      elapsedTime,
+    });
+  }, [elapsedTime]);
+
+  useEffect(() => {
     if (state.loading) {
       return;
     }
     // save state on any change
-    // storeGameState(state);
+    storeGameState(state);
   }, [state]);
 
   useEffect(() => {
-    if (isNil(state.history)) {
+    if (state.history.length === 0) {
       return;
     }
     dispatch({
       type: 'move',
     });
   }, [state.history]);
-
-  const reset = useCallback(() => {
-    dispatch({
-      type: 'reset',
-    });
-  }, []);
-
-  const newGame = useCallback(() => {
-    const { state: gotState } = generateNewGameState(initialState);
-    // set its loading to false
-    gotState.loading = false;
-    // dispatch it to reducer
-    dispatch({
-      type: 'set_state',
-      state: gotState,
-    });
-
-    GameResult.getByGameNum(gotState.gameNum)
-      .then((gameResult) => {
-        const newGameResult = new GameResult(
-          gotState.gameNum,
-          0,
-          0,
-          GameResultStatus.NOT_COMPLETED,
-          gameResult?.id ? gameResult.id : undefined,
-        );
-        return newGameResult.save();
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }, []);
 
   useEffect(() => {
     // if (!hasWon) {
@@ -176,13 +137,56 @@ export default function useFreeCellGame() : [
     //     }
     //   };
     //   updateResult().catch((err) => console.log(err));
-  }, [hasWon]);
+  }, []);
+
+  const reset = useCallback(() => {
+    resetTimer();
+    dispatch({
+      type: 'reset',
+    });
+  }, [resetTimer]);
+
+  const newGame = useCallback(() => {
+    const { state: gotState } = generateNewGameState(initialState);
+    // set its loading to false
+    gotState.loading = false;
+    // dispatch it to reducer
+    dispatch({
+      type: 'set_state',
+      state: gotState,
+    });
+
+    const { gameNum } = gotState;
+    if (gameNum !== undefined) {
+      GameResult.getByGameNum(gameNum)
+        .then((gameResult) => {
+          const newGameResult = new GameResult(
+            gameNum,
+            0,
+            0,
+            GameResultStatus.NOT_COMPLETED,
+            gameResult?.id ? gameResult.id : undefined,
+          );
+          return newGameResult.save();
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    }
+  }, []);
 
   const undo = useCallback(() => {
     dispatch({
       type: 'undo',
     });
   }, []);
+
+  const togglePause = useCallback(() => {
+    dispatch({
+      type: 'pause',
+      paused: !state.paused,
+    });
+  }, [state.paused]);
 
   const onOpenCellClick = useCallback((cellIndex: number) => {
     dispatch({
@@ -198,15 +202,24 @@ export default function useFreeCellGame() : [
     });
   }, []);
 
+  const setCanStartTimerWrapper = useCallback((canStart: boolean) => {
+    // if canStartTimer is already true, do not update it
+    if (canStartTimer) {
+      return;
+    }
+    setCanStartTimer(canStart);
+  }, [canStartTimer]);
+
   return [
     state,
     canUndo,
     hasWon,
+    togglePause,
     reset,
     newGame,
     undo,
     onOpenCellClick,
     onCascadeClick,
-    setCanStartTimer,
+    setCanStartTimerWrapper,
   ];
 }

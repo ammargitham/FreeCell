@@ -6,6 +6,7 @@ import Actions from './Actions';
 import CardCellsContainer from './CardCellsContainer';
 import Tableau from './Tableau';
 import WonModal from './WonModal';
+import PausedModal from './PausedModal';
 
 const Container = styled.div`
   position: relative;
@@ -50,6 +51,7 @@ const LoaderContainer = styled.div`
 type BoardBoardProps = {
   canUndo: boolean,
   hasWon: boolean,
+  isPaused: boolean,
   activeCard?: number,
   openCards: Array<number | undefined>,
   foundationCards: Array<number | undefined>,
@@ -62,6 +64,7 @@ type BoardProps = {
   board: BoardBoardProps,
   loading: boolean,
   onOpenCellClick?: (index: number) => void,
+  onPauseClick?: () => void,
   onUndoClick?: () => void,
   onNewGameClick?: () => void,
   onResetClick?: () => void,
@@ -72,6 +75,7 @@ export default function Board({
   board = {
     canUndo: false,
     hasWon: false,
+    isPaused: false,
     activeCard: undefined,
     openCards: [],
     foundationCards: [],
@@ -81,6 +85,7 @@ export default function Board({
   },
   loading,
   onOpenCellClick,
+  onPauseClick,
   onUndoClick,
   onNewGameClick,
   onResetClick,
@@ -117,6 +122,12 @@ export default function Board({
         </LoaderContainer>
       ) : null}
       {board.hasWon ? <WonModal open /> : null}
+      {!board.hasWon && board.isPaused ? (
+        <PausedModal
+          open
+          onResumeClick={onPauseClick}
+        />
+      ) : null}
       <TopRow>
         <SubContainer>
           <CardCellsContainer
@@ -142,6 +153,8 @@ export default function Board({
         moveCount={board.moveCount}
         elapsedTime={board.elapsedTime}
         canUndo={board.canUndo}
+        isPaused={board.isPaused}
+        onPauseClick={onPauseClick}
         onUndoClick={onUndoClick}
         onNewGameClick={onNewGameClick}
         onResetClick={onResetClick}

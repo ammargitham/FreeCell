@@ -23,8 +23,10 @@ const ButtonsContainer = styled.div`
 
 type ActionsProps = {
   canUndo: boolean,
+  isPaused: boolean,
   moveCount: number,
   elapsedTime: number,
+  onPauseClick?: () => void,
   onUndoClick?: () => void,
   onNewGameClick?: () => void,
   onResetClick?: () => void,
@@ -32,8 +34,10 @@ type ActionsProps = {
 
 export default function Actions({
   canUndo,
+  isPaused,
   moveCount,
   elapsedTime,
+  onPauseClick,
   onUndoClick,
   onNewGameClick,
   onResetClick,
@@ -41,9 +45,16 @@ export default function Actions({
   return (
     <Container>
       <ButtonsContainer>
-        <button type="button" className="btn actionBtn" disabled>
-          <i className="icon pause" title="Pause" />
-          <span>Pause</span>
+        <button
+          type="button"
+          className="btn actionBtn"
+          onClick={onPauseClick}
+        >
+          <i
+            className={`icon ${isPaused ? 'resume' : 'pause'}`}
+            title={`${isPaused ? 'Resume' : 'Pause'}`}
+          />
+          <span>{isPaused ? 'Resume' : 'Pause'}</span>
         </button>
         <button
           type="button"
@@ -51,11 +62,11 @@ export default function Actions({
           disabled={!canUndo}
           onClick={onUndoClick}
         >
-          <i className="icon undo" title="Pause" />
+          <i className="icon undo" title="Undo" />
           Undo
         </button>
         <button type="button" className="btn actionBtn" onClick={onResetClick}>
-          <i className="icon reset" title="Pause" />
+          <i className="icon reset" title="Reset" />
           Reset
         </button>
         <button type="button" className="btn actionBtn" onClick={onNewGameClick}>

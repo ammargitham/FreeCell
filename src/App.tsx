@@ -10,6 +10,7 @@ export default function App() {
     state,
     canUndo,
     hasWon,
+    togglePause,
     reset,
     newGame,
     undo,
@@ -34,6 +35,7 @@ export default function App() {
         board={{
           canUndo,
           hasWon,
+          isPaused: state.paused,
           cascades: state.cascades,
           openCards: state.openCards,
           activeCard: state.activeCard,
@@ -43,6 +45,7 @@ export default function App() {
         }}
         loading={state.loading || !imagesLoaded}
         onOpenCellClick={onOpenCellClick}
+        onPauseClick={togglePause}
         onUndoClick={undo}
         onNewGameClick={newGame}
         onResetClick={reset}
