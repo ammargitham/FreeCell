@@ -9,7 +9,6 @@ const Container = styled.div`
   flex: 1;
   align-items: center;
   overflow: hidden;
-  /* padding: 0 3px; */
 `;
 
 const SubContainer = styled.div`
@@ -17,7 +16,6 @@ const SubContainer = styled.div`
   flex-direction: row;
   max-width: 1300px;
   width: calc(100% - 2rem);
-  /* padding: 1rem 0; */
   height: 100%;
 
   & > div.cascade {
