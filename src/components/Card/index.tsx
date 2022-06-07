@@ -10,7 +10,7 @@ const Container = styled.div<ContainerProps>`
   background: white;
   border: 1px solid black;
   border-radius: 8px;
-  width: ${(props) => props.$width}px;
+  width: ${(props) => props.$width - 2}px; // -2 to adjust for border
 
   &.clickable {
     cursor: pointer;

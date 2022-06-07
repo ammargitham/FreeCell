@@ -19,7 +19,7 @@ const SubContainer = styled.div`
   display: flex;
   flex-direction: row;
   max-width: 1300px;
-  width: calc(100% - 2rem);
+  width: 100%;
   height: 100%;
 
   & > div.cascade {
