@@ -14,7 +14,6 @@ type ContainerProps = {
 };
 
 const Container = styled.div<ContainerProps>`
-  /* position: relative; */
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -24,8 +23,6 @@ const Container = styled.div<ContainerProps>`
   }
 
   & div.card {
-    /* position: absolute; */
-    /* margin-top: -100%; */
     margin-top: ${(props) => props.$topOffset}px;
     transition: margin 300ms;
     position: relative;
@@ -34,7 +31,7 @@ const Container = styled.div<ContainerProps>`
       margin-top: 0;
     }
 
-    &.active::after {
+    /* &.active::after {
       content: "";
       display: block;
       position: absolute;
@@ -44,7 +41,7 @@ const Container = styled.div<ContainerProps>`
       right: -3px;
       border: 3px solid #000;
       border-radius: 8px;
-    }
+    } */
   }
 `;
 
@@ -110,9 +107,10 @@ export default function Cascade({
         return (
           <Card
             ref={i === 0 ? cardRef : null}
-            className={`${isActive ? 'active' : ''}`}
             key={card}
+            className="card"
             card={actual}
+            isActive={isActive}
             width={width}
           />
         );

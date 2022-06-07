@@ -15,12 +15,18 @@ const Container = styled.div<ContainerProps>`
   &.clickable {
     cursor: pointer;
   }
+
+  &.active {
+    transform: scale(1.03);
+    box-shadow: 0px 0px 20px 9px #23d5e2;
+  }
 `;
 
 type CardProps = {
   card: CardType,
   className?: string,
   width: number,
+  isActive?: boolean,
   onClick?: () => void,
 };
 
@@ -29,6 +35,7 @@ function Card(
     card,
     className,
     width,
+    isActive,
     onClick,
   }: CardProps,
   ref: ForwardedRef<HTMLDivElement>,
@@ -50,7 +57,11 @@ function Card(
   return (
     <Container
       ref={ref}
-      className={`card ${className || ''} ${onClick ? 'clickable' : ''}`}
+      className={`
+        ${className || ''}
+        ${onClick ? 'clickable' : ''}
+        ${isActive ? 'active' : ''}
+      `.trim()}
       onClick={onClick || undefined}
       $width={width}
     >
