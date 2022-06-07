@@ -2,7 +2,7 @@ import {
   useMemo, forwardRef, ForwardedRef, CSSProperties,
 } from 'react';
 import styled from 'styled-components';
-import { Card as CardType } from '../globals/types';
+import { Card as CardType } from '../../globals/types';
 
 const Container = styled.div`
   background: white;

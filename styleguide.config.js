@@ -20,7 +20,7 @@ webpackConfig.plugins.push(
 
 module.exports = {
   assetsDir: "./public",
-  components: 'src/Board/**/*.tsx',
+  components: 'src/components/**/*.tsx',
   getExampleFilename(componentPath) {
     return componentPath.replace(/\.tsx?$/, '.examples.md')
   },

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 // import useComponentSize from "@rehooks/component-size";
 import { isNil } from 'lodash';
 
-import Card from '../Card';
+import Card from '../../components/Card';
 import { indexToCard } from '../../game/helper';
 // import useWindowSize from "../../utils/useWindowSize";
 import useDebounce from '../../utils/useDebounce';

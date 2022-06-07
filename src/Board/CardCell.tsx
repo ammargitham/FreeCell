@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import Card from './Card';
+import Card from '../components/Card';
 import { indexToCard } from '../game/helper';
 
 const EmptyCell = styled.div`

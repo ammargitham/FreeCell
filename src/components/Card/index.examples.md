@@ -1,5 +1,5 @@
-```jsx padded
-import { indexToCard } from '../game/helper';
+```jsx
+import { indexToCard } from '../../game/helper';
 
 <Card
   card={indexToCard(0)}
