@@ -27,7 +27,9 @@
     ],
     "ignorePatterns": [
         "**/*.html",
-        "craco.config.js"
+        "craco.config.js",
+        "styleguide.config.js",
+        "webpack.config.js"
     ],
     "rules": {
         "react/jsx-filename-extension": [
