@@ -3,12 +3,16 @@ import styled from 'styled-components';
 import Card from '../components/Card';
 import { indexToCard } from '../game/helper';
 
-const EmptyCell = styled.div`
-  display: flex;
+type EmptyCellProp = {
+  $width: number,
+};
+
+const EmptyCell = styled.div<EmptyCellProp>`
+  /* display: flex; */
   border: 1px solid black;
   border-radius: 0.5rem;
-  width: 100%;
-  /* background: white; */
+  width: ${(props) => props.$width}px;
+  aspect-ratio: 73 / 108;
 
   &.clickable {
     cursor: pointer;
@@ -19,11 +23,16 @@ type CardCellProps = {
   card?: number,
   className?: string,
   isActive?: boolean,
+  width: number,
   onClick?: () => void,
 };
 
 export default function CardCell({
-  card, className, isActive, onClick,
+  card,
+  className,
+  isActive,
+  width,
+  onClick,
 }: CardCellProps) {
   let c;
   if (card !== undefined) {
@@ -33,6 +42,7 @@ export default function CardCell({
     return (
       <EmptyCell
         className={`${className || ''} ${onClick ? 'clickable' : ''}`}
+        $width={width}
         onClick={onClick}
       />
     );
@@ -41,6 +51,7 @@ export default function CardCell({
     <Card
       className={`${className || ''} ${isActive && 'active'}`}
       card={c}
+      width={width}
       onClick={onClick}
     />
   );

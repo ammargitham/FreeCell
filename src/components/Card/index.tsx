@@ -1,13 +1,16 @@
-import {
-  useMemo, forwardRef, ForwardedRef, CSSProperties,
-} from 'react';
+import { useMemo, forwardRef, ForwardedRef } from 'react';
 import styled from 'styled-components';
 import { Card as CardType } from '../../globals/types';
 
-const Container = styled.div`
+type ContainerProps = {
+  $width: number,
+};
+
+const Container = styled.div<ContainerProps>`
   background: white;
   border: 1px solid black;
   border-radius: 8px;
+  width: ${(props) => props.$width}px;
 
   &.clickable {
     cursor: pointer;
@@ -17,7 +20,7 @@ const Container = styled.div`
 type CardProps = {
   card: CardType,
   className?: string,
-  style?: CSSProperties,
+  width: number,
   onClick?: () => void,
 };
 
@@ -25,7 +28,7 @@ function Card(
   {
     card,
     className,
-    style,
+    width,
     onClick,
   }: CardProps,
   ref: ForwardedRef<HTMLDivElement>,
@@ -48,8 +51,8 @@ function Card(
     <Container
       ref={ref}
       className={`card ${className || ''} ${onClick ? 'clickable' : ''}`}
-      style={style}
       onClick={onClick || undefined}
+      $width={width}
     >
       {src ? (
         <img

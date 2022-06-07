@@ -50,11 +50,17 @@ const Container = styled.div<ContainerProps>`
 
 type CascadeProps = {
   cards: Array<number>,
+  width: number,
   activeCard?: number,
   onCascadeClick?: () => void,
 };
 
-export default function Cascade({ cards = [], activeCard, onCascadeClick }: CascadeProps) {
+export default function Cascade({
+  cards = [],
+  width,
+  activeCard,
+  onCascadeClick,
+}: CascadeProps) {
   const [ref, { height }] = useComponentSize<HTMLDivElement>();
   const debouncedHeight = useDebounce(height, 200);
 
@@ -107,6 +113,7 @@ export default function Cascade({ cards = [], activeCard, onCascadeClick }: Casc
             className={`${isActive ? 'active' : ''}`}
             key={card}
             card={actual}
+            width={width}
           />
         );
       })}

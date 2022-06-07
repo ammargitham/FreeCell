@@ -1,6 +1,10 @@
+import { useCallback, useState } from 'react';
 import styled from 'styled-components';
+import { calcColWidth } from '../../utils';
 
 import Cascade from './Cascade';
+
+const spacingRem = 1;
 
 const Container = styled.div`
   display: flex;
@@ -19,8 +23,8 @@ const SubContainer = styled.div`
   height: 100%;
 
   & > div.cascade {
-    margin-left: 1rem;
-    flex: 1;
+    margin-left: ${spacingRem}rem;
+    /* flex: 1; */
 
     &:first-child {
       margin-left: 0;
@@ -39,15 +43,28 @@ export default function Tableau({
   activeCard,
   onCascadeClick,
 }: TableauProps) {
+  const [cascadeWidth, setCascadeWidth] = useState(0);
+
+  const ref = useCallback((node: HTMLDivElement) => {
+    if (!node) {
+      setCascadeWidth(0);
+      return;
+    }
+    setCascadeWidth(calcColWidth(node.clientWidth, 'px', spacingRem, 'rem', 8));
+  }, []);
+
   return (
     <Container>
-      <SubContainer>
+      <SubContainer
+        ref={ref}
+      >
         {Array.from({ length: 8 }).map((_v, i) => (
           <Cascade
             // eslint-disable-next-line react/no-array-index-key
             key={i}
             cards={cascades[i]}
             activeCard={activeCard}
+            width={cascadeWidth}
             onCascadeClick={() => onCascadeClick && onCascadeClick(i)}
           />
         ))}

@@ -1,17 +1,19 @@
+import { useCallback, useState } from 'react';
 import styled from 'styled-components';
+import { calcColWidth } from '../utils';
 
 import CardCell from './CardCell';
+
+const cellSpacingRem = 1;
 
 const Container = styled.div`
   display: flex;
   flex-direction: row;
   flex: 1;
-  /* overflow: hidden; */
 
   & > div.card-cell {
-    margin-left: 1em;
-    flex: 1;
-    aspect-ratio: 110 / 160;
+    margin-left: ${cellSpacingRem}rem;
+    /* flex: 1; */
 
     &:first-child {
       margin-left: 0;
@@ -48,8 +50,20 @@ export default function CardCellsContainer({
   cellClickable,
   onCellClick,
 }: CardCellsContainerProps) {
+  const [cellWidth, setCellWidth] = useState(0);
+
+  const ref = useCallback((node: HTMLDivElement) => {
+    if (!node) {
+      setCellWidth(0);
+      return;
+    }
+    setCellWidth(calcColWidth(node.clientWidth, 'px', cellSpacingRem, 'rem', 4));
+  }, []);
+
   return (
-    <Container>
+    <Container
+      ref={ref}
+    >
       {Array(4)
         .fill(null)
         .map((_, i) => {
@@ -62,6 +76,7 @@ export default function CardCellsContainer({
               className="card-cell"
               card={card}
               isActive={isActive}
+              width={cellWidth}
               onClick={
                 cellClickable && cellClickable(i) && onCellClick
                   ? () => onCellClick(i)
