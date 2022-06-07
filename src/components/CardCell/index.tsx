@@ -1,14 +1,13 @@
 import styled from 'styled-components';
 
-import Card from '../components/Card';
-import { indexToCard } from '../game/helper';
+import Card from '../Card';
+import { indexToCard } from '../../game/helper';
 
 type EmptyCellProp = {
   $width: number,
 };
 
 const EmptyCell = styled.div<EmptyCellProp>`
-  /* display: flex; */
   border: 1px solid black;
   border-radius: 0.5rem;
   width: ${(props) => props.$width}px;
