@@ -1,4 +1,6 @@
 import { useEffect, useRef } from 'react';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import Board from './Board';
 import useFreeCellGame from './game';
@@ -31,26 +33,28 @@ export default function App() {
       className="App"
       ref={appRef}
     >
-      <Board
-        board={{
-          canUndo,
-          hasWon,
-          isPaused: state.paused,
-          cascades: state.cascades,
-          openCards: state.openCards,
-          activeCard: state.activeCard,
-          foundationCards: state.foundationCards,
-          moveCount: state.moveCount,
-          elapsedTime: state.elapsedTime,
-        }}
-        loading={state.loading || !imagesLoaded}
-        onOpenCellClick={onOpenCellClick}
-        onPauseClick={togglePause}
-        onUndoClick={undo}
-        onNewGameClick={newGame}
-        onResetClick={reset}
-        onCascadeClick={onCascadeClick}
-      />
+      <DndProvider backend={HTML5Backend}>
+        <Board
+          board={{
+            canUndo,
+            hasWon,
+            isPaused: state.paused,
+            cascades: state.cascades,
+            openCards: state.openCards,
+            activeCard: state.activeCard,
+            foundationCards: state.foundationCards,
+            moveCount: state.moveCount,
+            elapsedTime: state.elapsedTime,
+          }}
+          loading={state.loading || !imagesLoaded}
+          onOpenCellClick={onOpenCellClick}
+          onPauseClick={togglePause}
+          onUndoClick={undo}
+          onNewGameClick={newGame}
+          onResetClick={reset}
+          onCascadeClick={onCascadeClick}
+        />
+      </DndProvider>
     </div>
   );
 }
