@@ -1,11 +1,9 @@
 import { useMemo } from 'react';
 import styled from 'styled-components';
-// import useComponentSize from "@rehooks/component-size";
 import { isNil } from 'lodash';
 
 import { indexToCard } from '../../game/helper';
 import Card from '../Card';
-// import useWindowSize from "../../utils/useWindowSize";
 import useComponentSize from '../../utils/useComponentSize';
 import useDebounce from '../../utils/useDebounce';
 
