@@ -1,0 +1,81 @@
+// https://codepen.io/timothylong/pen/AJxrPR
+.modal-window {
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.8);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 999;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s;
+  
+  &.open {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  & > div {
+    width: 400px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 2em;
+    background: green;
+    border-radius: 1rem;
+
+    &:before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      border: 4px solid #FFAB23;
+      border-radius: 1rem;
+    }
+
+    &:after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      bottom: 2px;
+      left: 2px;
+      right: 2px;
+      border: 2px solid #976617;
+      border-radius: 1rem;
+    }
+  }
+  
+  & div:not(:last-of-type) {
+    margin-bottom: 15px;
+  }
+  
+  header {
+    font-weight: bold;
+  }
+  
+  h1 {
+    font-size: 150%;
+    margin: 0 0 15px;
+  }
+}
+
+.modal-close {
+  color: #aaa;
+  line-height: 50px;
+  font-size: 80%;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  top: 0;
+  width: 70px;
+  text-decoration: none;
+  &:hover {
+    color: black;
+  }
+}

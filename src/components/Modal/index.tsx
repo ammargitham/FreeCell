@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+import './styles.scss';
+
 type StyledModalWindowProps = {
   $alpha?: number,
 };
