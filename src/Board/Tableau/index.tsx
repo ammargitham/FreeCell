@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { calcColWidth } from '../../utils';
 
-import Cascade from './Cascade';
+import Cascade from '../../components/Cascade';
 
 const spacingRem = 1;
 

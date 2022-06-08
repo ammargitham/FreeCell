@@ -3,11 +3,11 @@ import styled from 'styled-components';
 // import useComponentSize from "@rehooks/component-size";
 import { isNil } from 'lodash';
 
-import Card from '../../components/Card';
 import { indexToCard } from '../../game/helper';
+import Card from '../Card';
 // import useWindowSize from "../../utils/useWindowSize";
-import useDebounce from '../../utils/useDebounce';
 import useComponentSize from '../../utils/useComponentSize';
+import useDebounce from '../../utils/useDebounce';
 
 type ContainerProps = {
   $topOffset: number,
