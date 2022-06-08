@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react';
 import styled from 'styled-components';
-import { calcColWidth } from '../utils';
+import { calcColWidth } from '../../utils';
 
-import CardCell from '../components/CardCell';
+import CardCell from '../CardCell';
 
 const cellSpacingRem = 1;
 

@@ -1,12 +1,12 @@
+import { isNil } from 'lodash';
 import { useCallback } from 'react';
 import styled from 'styled-components';
-import { isNil } from 'lodash';
 
+import CardCellsContainer from '../components/CardCellsContainer';
 import Actions from './Actions';
-import CardCellsContainer from './CardCellsContainer';
+import PausedModal from './PausedModal';
 import Tableau from './Tableau';
 import WonModal from './WonModal';
-import PausedModal from './PausedModal';
 
 const Container = styled.div`
   position: relative;
