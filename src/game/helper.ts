@@ -76,7 +76,7 @@ export const getRandomCascades = (gameNum: number) => {
   const sizes = [7, 7, 7, 7, 6, 6, 6, 6];
   let i = 0;
   let j = 0;
-  const chunks = [];
+  const chunks: number[][] = [];
   while (i < shuffled.length) {
     // eslint-disable-next-line no-plusplus
     chunks.push(shuffled.slice(i, (i += sizes[j++ % sizes.length])));

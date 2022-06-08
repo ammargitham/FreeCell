@@ -13,6 +13,7 @@ const Container = styled.div`
   flex: 1;
   align-items: center;
   overflow: hidden;
+  height: 100%;
 `;
 
 const SubContainer = styled.div`
@@ -24,7 +25,6 @@ const SubContainer = styled.div`
 
   & > div.cascade {
     margin-left: ${spacingRem}rem;
-    /* flex: 1; */
 
     &:first-child {
       margin-left: 0;
