@@ -3,9 +3,9 @@ import { useCallback } from 'react';
 import styled from 'styled-components';
 
 import CardCellsContainer from '../components/CardCellsContainer';
+import Tableau from '../components/Tableau';
 import Actions from './Actions';
 import PausedModal from './PausedModal';
-import Tableau from './Tableau';
 import WonModal from './WonModal';
 
 const Container = styled.div`
