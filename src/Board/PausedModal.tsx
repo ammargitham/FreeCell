@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import Modal from '../Modal';
+import Modal from '../components/Modal';
 
 const Container = styled.div`
   display: flex;
