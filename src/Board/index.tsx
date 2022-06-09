@@ -4,9 +4,9 @@ import styled from 'styled-components';
 
 import CardCellsContainer from '../components/CardCellsContainer';
 import PausedModal from '../components/Modal/PausedModal';
+import WonModal from '../components/Modal/WonModal';
 import Tableau from '../components/Tableau';
 import Actions from './Actions';
-import WonModal from './WonModal';
 
 const Container = styled.div`
   position: relative;
