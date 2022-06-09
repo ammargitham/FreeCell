@@ -21,6 +21,31 @@ const Container = styled.div`
   }
 `;
 
+type PausedModalContentProps = {
+  onResumeClick?: () => void,
+};
+
+export function PausedModalContent({ onResumeClick }: PausedModalContentProps) {
+  return (
+    <Container>
+      <span className="header">Game paused</span>
+      <div className="actions">
+        <button
+          type="button"
+          className="btn actionBtn"
+          onClick={onResumeClick}
+        >
+          <i
+            className="icon resume"
+            title="Resume"
+          />
+          Resume
+        </button>
+      </div>
+    </Container>
+  );
+}
+
 type PausedModalProps = {
   open?: boolean,
   onResumeClick?: () => void,
@@ -32,22 +57,9 @@ export default function PausedModal({ open, onResumeClick }: PausedModalProps) {
       open={open}
       overlayAlpha={0.98}
     >
-      <Container>
-        <span className="header">Game paused</span>
-        <div className="actions">
-          <button
-            type="button"
-            className="btn actionBtn"
-            onClick={onResumeClick}
-          >
-            <i
-              className="icon resume"
-              title="Resume"
-            />
-            Resume
-          </button>
-        </div>
-      </Container>
+      <PausedModalContent
+        onResumeClick={onResumeClick}
+      />
     </Modal>
   );
 }
