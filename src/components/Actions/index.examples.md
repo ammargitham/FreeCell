@@ -1,20 +1,26 @@
 Default actions
 ```jsx
-<Actions />
+<div style={{ backgroundColor: 'green' }}>
+  <Actions />
+</div>
 ```
 
 Can undo actions
 ```jsx
-<Actions
-  canUndo={true}
-/>
+<div style={{ backgroundColor: 'green' }}>
+  <Actions
+    canUndo={true}
+  />
+</div>
 ```
 
 With move count and time
 ```jsx
-<Actions
-  canUndo={true}
-  elapsedTime={100}
-  moveCount={20}
-/>
+<div style={{ backgroundColor: 'green' }}>
+  <Actions
+    canUndo={true}
+    elapsedTime={100}
+    moveCount={20}
+  />
+</div>
 ```
