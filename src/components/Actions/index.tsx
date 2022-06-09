@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import formatSeconds from '../utils/formatSeconds';
+import formatSeconds from '../../utils/formatSeconds';
 
 const Container = styled.div`
   display: flex;
