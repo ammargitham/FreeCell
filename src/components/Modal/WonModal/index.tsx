@@ -20,6 +20,27 @@ const Container = styled.div`
   }
 `;
 
+type WonModalContentProps = {
+  onNewGameClick?: () => void,
+};
+
+export function WonModalContent({ onNewGameClick }: WonModalContentProps) {
+  return (
+    <Container>
+      <span className="header">Game won!</span>
+      <div className="actions">
+        <button
+          type="button"
+          className="btn actionBtn"
+          onClick={onNewGameClick}
+        >
+          New Game
+        </button>
+      </div>
+    </Container>
+  );
+}
+
 type WonModalProps = {
   open?: boolean,
   onNewGameClick?: () => void,
@@ -28,18 +49,9 @@ type WonModalProps = {
 export default function WonModal({ open, onNewGameClick }: WonModalProps) {
   return (
     <Modal open={open}>
-      <Container>
-        <span className="header">Game won!</span>
-        <div className="actions">
-          <button
-            type="button"
-            className="btn actionBtn"
-            onClick={onNewGameClick}
-          >
-            New Game
-          </button>
-        </div>
-      </Container>
+      <WonModalContent
+        onNewGameClick={onNewGameClick}
+      />
     </Modal>
   );
 }
