@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import formatSeconds from '../../utils/formatSeconds';
+import Button from '../Button';
 
 const Container = styled.div`
   display: flex;
@@ -60,9 +61,7 @@ export default function Actions({
   return (
     <Container>
       <ButtonsContainer>
-        <button
-          type="button"
-          className="btn actionBtn"
+        <Button
           onClick={onPauseClick}
         >
           <i
@@ -70,23 +69,25 @@ export default function Actions({
             title={`${isPaused ? 'Resume' : 'Pause'}`}
           />
           <span>{isPaused ? 'Resume' : 'Pause'}</span>
-        </button>
-        <button
-          type="button"
-          className="btn actionBtn"
+        </Button>
+        <Button
           disabled={!canUndo}
           onClick={onUndoClick}
         >
           <i className="icon undo" title="Undo" />
           Undo
-        </button>
-        <button type="button" className="btn actionBtn" onClick={onResetClick}>
+        </Button>
+        <Button
+          onClick={onResetClick}
+        >
           <i className="icon reset" title="Reset" />
           Reset
-        </button>
-        <button type="button" className="btn actionBtn" onClick={onNewGameClick}>
+        </Button>
+        <Button
+          onClick={onNewGameClick}
+        >
           New Game
-        </button>
+        </Button>
       </ButtonsContainer>
       <InfoContainer>
         <span>

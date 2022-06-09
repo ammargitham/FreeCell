@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import Modal from '..';
+import Button from '../../Button';
 
 const Container = styled.div`
   display: flex;
@@ -30,9 +31,7 @@ export function PausedModalContent({ onResumeClick }: PausedModalContentProps) {
     <Container>
       <span className="header">Game paused</span>
       <div className="actions">
-        <button
-          type="button"
-          className="btn actionBtn"
+        <Button
           onClick={onResumeClick}
         >
           <i
@@ -40,7 +39,7 @@ export function PausedModalContent({ onResumeClick }: PausedModalContentProps) {
             title="Resume"
           />
           Resume
-        </button>
+        </Button>
       </div>
     </Container>
   );
