@@ -5,9 +5,6 @@ const Container = styled.div`
   display: flex;
   flex-direction: row;
   padding: 1rem;
-  /* width: 100%; */
-  /* height: 5rem; */
-  /* border-top: 1px solid black; */
 `;
 
 const ButtonsContainer = styled.div`
@@ -98,7 +95,7 @@ export default function Actions({
         </span>
         <span>
           <span className="label">Moves:</span>
-          {moveCount}
+          {moveCount || 0}
         </span>
       </InfoContainer>
     </Container>
