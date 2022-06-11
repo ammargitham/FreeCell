@@ -11,7 +11,7 @@ type ContainerProps = {
 const Container = styled.div<ContainerProps>`
   position: relative;
   width: ${(props) => props.$width}px;
-  aspect-ratio: ${(props) => (props.$isEmpty ? '135 : 197' : null)};
+  aspect-ratio: ${(props) => (props.$isEmpty ? '135 / 197' : null)};
   cursor: ${(props) => (props.onClick ? 'pointer' : null)};
 
   &:before {
