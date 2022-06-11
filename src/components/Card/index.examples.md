@@ -31,3 +31,26 @@ import { indexToCard } from '../../game/helper';
   isActive
 />
 ```
+
+No border
+```jsx
+import { indexToCard } from '../../game/helper';
+
+<Card
+  card={indexToCard(0)}
+  width={200}
+  hideBorder
+/>
+```
+
+No border, active (should show border)
+```jsx
+import { indexToCard } from '../../game/helper';
+
+<Card
+  card={indexToCard(0)}
+  width={200}
+  hideBorder
+  isActive
+/>
+```

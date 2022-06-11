@@ -12,6 +12,7 @@ type ContainerProps = {
 
 const Container = styled.div<ContainerProps>`
   width: fit-content;
+  border-radius: 0.5rem;
   opacity: ${(props) => (props.$isDragging ? 0 : 1)};
 `;
 
@@ -20,8 +21,9 @@ type DraggableCardProps = {
   className?: string,
   width: number,
   isActive?: boolean,
-  isDraggable: boolean,
+  isDraggable?: boolean,
   showPreview?: boolean,
+  hideBorder?: boolean,
   onClick?: () => void,
 };
 
@@ -32,6 +34,7 @@ export default function DraggableCard({
   isActive,
   isDraggable,
   showPreview,
+  hideBorder,
   onClick,
 }: DraggableCardProps) {
   const [{ isDragging }, drag, dragPreview] = useDrag(() => ({
@@ -65,6 +68,7 @@ export default function DraggableCard({
         className={className}
         width={width}
         isActive={isActive}
+        hideBorder={hideBorder}
         onClick={onClick}
       />
     </Container>

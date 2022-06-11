@@ -4,12 +4,15 @@ import { Card as CardType } from '../../globals/types';
 
 type ContainerProps = {
   $width: number,
+  $hideBorder?: boolean,
 };
 
 const Container = styled.div<ContainerProps>`
   background: white;
-  border: 1px solid black;
-  border-radius: 8px;
+  border-width: ${(props) => (props.$hideBorder ? 0 : 1)}px;
+  border-color: black;
+  border-style: solid;
+  border-radius: 0.5rem;
   width: ${(props) => props.$width - 2}px; // -2 to adjust for border
 
   &.clickable {
@@ -19,6 +22,7 @@ const Container = styled.div<ContainerProps>`
   &.active {
     transform: scale(1.03);
     box-shadow: 0px 0px 20px 9px #23d5e2;
+    border-width: 1px;
   }
 `;
 
@@ -27,6 +31,7 @@ type CardProps = {
   className?: string,
   width: number,
   isActive?: boolean,
+  hideBorder?: boolean,
   onClick?: () => void,
 };
 
@@ -36,6 +41,7 @@ function Card(
     className,
     width,
     isActive,
+    hideBorder,
     onClick,
   }: CardProps,
   ref: ForwardedRef<HTMLDivElement>,
@@ -64,6 +70,7 @@ function Card(
       `.trim()}
       onClick={onClick || undefined}
       $width={width}
+      $hideBorder={hideBorder}
     >
       {src ? (
         <img
