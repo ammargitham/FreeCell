@@ -40,6 +40,7 @@ const Container = styled.div`
 type CardCellsContainerProps = {
   cards?: Array<number | undefined>,
   activeCard?: number,
+  cardsDraggable?: boolean,
   cellClickable?: (index: number) => boolean,
   onCellClick?: (index: number) => void,
 };
@@ -47,6 +48,7 @@ type CardCellsContainerProps = {
 export default function CardCellsContainer({
   cards,
   activeCard,
+  cardsDraggable,
   cellClickable,
   onCellClick,
 }: CardCellsContainerProps) {
@@ -77,6 +79,7 @@ export default function CardCellsContainer({
               card={card}
               isActive={isActive}
               width={cellWidth}
+              isDraggable={cardsDraggable}
               onClick={
                 cellClickable && cellClickable(i) && onCellClick
                   ? () => onCellClick(i)

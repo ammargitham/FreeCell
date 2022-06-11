@@ -134,6 +134,7 @@ export default function Board({
             key="open-cells"
             cards={board.openCards}
             activeCard={board.activeCard}
+            cardsDraggable
             cellClickable={openCellClickable}
             onCellClick={onOpenCellClick}
           />
