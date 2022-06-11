@@ -59,3 +59,7 @@ export type MoveToFoundationCheckResult = {
    */
   shouldMove: boolean,
 };
+
+export const DragType = {
+  CARD: 'card',
+};
